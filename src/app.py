@@ -6,10 +6,13 @@ from flask_restful import Api
 
 ## import model
 from src.db.connection import DBConnection
+from src.urls import initUrls
 
 app = Flask(__name__)
 api = Api(app)
 DBConnection.init(app)
+
+initUrls(api)
 
 ## INIT
 if __name__ == "__main__":
