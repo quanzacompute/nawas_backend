@@ -1,15 +1,30 @@
 version: '3.3'
 services:
+  api:
+    build:
+      context: flask
+      dockerfile: Dockerfile
+    restart: always
+    secrets:
+      - mysql_password
+    bind:
+      - 8000:8000  
   db: 
     image: "mysql:8.3"
     restart: always
-    command: "--init-file /opt/scripts/00_init.sql" 
     environment:
-      - MYSQL_ROOT_PASSWORD="testing123"
+      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+      - MYSQL_USER=api
+      - MYSQL_DATABASE=nawas
     volumes:
       - ./src/sql:/opt/scripts/
       - mysql:/var/lib/mysql
+    secrets:
+      - mysql_password
 volumes:
   mysql:
+secrets:
+  mysql_password:
+    environment: MYSQL_PASSWORD
 
     
