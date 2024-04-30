@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  db: 
+    image: "mysql:8.3"
+    restart: always
+    command: "--init-file /opt/scripts/00_init.sql" 
+    environment:
+      - MYSQL_ROOT_PASSWORD="testing123"
+    volumes:
+      - ./src/sql:/opt/scripts/
+      - mysql:/var/lib/mysql
+volumes:
+  mysql:
+
+    
