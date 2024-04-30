@@ -4,7 +4,7 @@ import unittest
 from app import app, db
 from test import *
 
-class TestAPI(unittest.TestSuite)
+class TestAPI(unittest.TestSuite):
 
     @classmethod
     def suite(cls):
