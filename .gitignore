@@ -1,3 +1,6 @@
+# secrets
+secrets/*
+
 # vim ignores
 **.swp
 **.swo

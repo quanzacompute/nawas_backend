@@ -4,14 +4,15 @@ services:
     image: "mysql:8.3"
     restart: always
     environment:
-      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
       - MYSQL_USER=api
       - MYSQL_DATABASE=nawas
     volumes:
       - ./src/sql:/opt/scripts/
       - mysql:/var/lib/mysql
     secrets:
-      - mysql_password
+      - db_password
   api:
     depends_on:
       - db
@@ -20,13 +21,15 @@ services:
       dockerfile: Dockerfile
     restart: always
     secrets:
-      - mysql_password
+      - db_password
     ports:
        - "8000:8000"
 volumes:
   mysql:
 secrets:
-  mysql_password:
-    environment: MYSQL_PASSWORD
+  db_password:
+    file: secrets/db_password.txt
+  db_root_password:
+    file: secrets/db_root_password.txt
 
     

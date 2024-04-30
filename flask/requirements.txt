@@ -4,4 +4,3 @@ flask_restful
 flask_sqlalchemy
 sqlalchemy
 sqlalchemy_continuum
-unittest

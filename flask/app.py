@@ -1,12 +1,10 @@
-from time import sleep
-
 # flask modules
 from flask import Flask
 from flask_restful import Api
 
 ## import model
-from src.db.connection import DBConnection
-from src.urls import initUrls
+from .model.db.connection import DBConnection
+from .urls import initUrls
 
 app = Flask(__name__)
 api = Api(app)

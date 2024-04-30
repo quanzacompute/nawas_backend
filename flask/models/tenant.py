@@ -1,4 +1,4 @@
-from .models.db import DBConnection
+from .db import DBConnection
 
 from flask import jsonify, request
 from flask_restful import Resource, fields, marshal_with, reqparse
