@@ -21,8 +21,8 @@ services:
     restart: always
     secrets:
       - mysql_password
-    bind:
-       - 8000:8000
+    ports:
+       - "8000:8000"
 volumes:
   mysql:
 secrets:
