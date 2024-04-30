@@ -3,9 +3,14 @@ import os, psycopg2
 
 class DBConnection:
     connection = None
-    
-    def init_connection():
 
+    def init(app):
+        app.config['SQLALCHEMY_DATABASE_URI'] = DBConnection.build_uri()
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+        connection = SQLAlchemy(app)
+
+    def build_uri():
         ## Read secrets
         DB_HOST="mysql"
         DB_NAME="nawas"
@@ -20,27 +25,16 @@ class DBConnection:
             print("ERROR ERROR NO PASSWORD DETECTED")
             exit(1)
 
-        ## Wait for connection
-        while True:
-            try:
-                connection = psycopg2.connect(
-                    "host={} dbname={} user={} password={}".format(DB_HOST, DB_NAME, DB_USER, DB_PASSWORD)
-                )
-                break
-            except psycopg2.OperationalError:
-                sleep(1)
-            finally:
-                print("DB connection established.")
+        return "mysql://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,DB_HOST,DB_NAME)
 
     def get_connection():
         if connection is None:
-            init_connection()
+            raise DBConnectionNotInitialised("DBConnection was not initialised before requesting connection")
 
         return connection
-    
-    def get_cursor():
-        get_connection().cursor()
 
-    def close():
-        if connection is not None:
-            connection.close()
+
+## custom error for when connection is requested before DBConnection has run init(app)
+class DBConnectionNotInitialised(Exception):
+    def __init__(self, message, errors):
+        super().init(message)
