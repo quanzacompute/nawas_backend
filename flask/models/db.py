@@ -37,9 +37,9 @@ def get_connection():
 ## custom error for missing password in secrets location
 class DBPasswordNotFoundException(Exception):
     def __init__(self, message):
-        super().init(message)
+        super(message)
 
 ## custom error for when connection is requested before DBConnection has run init(app)
 class DBConnectionNotInitialisedException(Exception):
     def __init__(self, message):
-        super().init(message)
+        super(message)
