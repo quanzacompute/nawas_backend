@@ -1,12 +1,14 @@
 
-import os, psycopg2
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_continuum import make_versioned
 
 class DBConnection:
     connection = None
 
     def init(app):
         app.config['SQLALCHEMY_DATABASE_URI'] = DBConnection.build_uri()
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        make_versioned
 
         connection = SQLAlchemy(app)
 
@@ -25,6 +27,9 @@ class DBConnection:
             raise DBPasswordNotFoundException("DB_PASSWORD was not found in the expected location (/run/secrets/DB_PASSWORD)")
 
         return "mysql://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,DB_HOST,DB_NAME)
+
+    def build_uri(host, db, user, password):
+        return "mysql://{}:{}@{}/{}".format(host, db, user, password)
 
     def get_connection():
         if connection is None:
