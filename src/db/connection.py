@@ -22,19 +22,23 @@ class DBConnection:
             DB_PASSWORD = f.readlines()
 
         if DB_PASSWORD is None:
-            print("ERROR ERROR NO PASSWORD DETECTED")
-            exit(1)
+            raise DBPasswordNotFoundException("DB_PASSWORD was not found in the expected location (/run/secrets/DB_PASSWORD)")
 
         return "mysql://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,DB_HOST,DB_NAME)
 
     def get_connection():
         if connection is None:
-            raise DBConnectionNotInitialised("DBConnection was not initialised before requesting connection")
+            raise DBConnectionNotInitialisedException("DBConnection was not initialised before requesting connection")
 
         return connection
 
 
+## custom error for missing password in secrets location
+class DBPasswordNotFoundException(Exception):
+    def __init__(self, message, errors):
+        super().init(message)
+
 ## custom error for when connection is requested before DBConnection has run init(app)
-class DBConnectionNotInitialised(Exception):
+class DBConnectionNotInitialisedException(Exception):
     def __init__(self, message, errors):
         super().init(message)
