@@ -13,10 +13,8 @@ def initUrls(api):
     
     #asn
     api.add_resource(ASNList, "/asn/")
-    api.add_resource(ASNListByTenant, "/asn/tenant/<int:id>")
     api.add_resource(ASNByASN, "/asn/<int:asn>")
     
     #prefix
     api.add_resource(PrefixList, "/prefix/")
-    api.add_resource(PrefixByASN, "/prefix/asn/<int:asn>")
     api.add_resource(PrefixByID, "/prefix/<int:id>")
