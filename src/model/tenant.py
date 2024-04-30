@@ -14,10 +14,20 @@ class Tenant(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     ##TODO: add more fields if required
 
+    ## relationships
+    asns = db.relationship('ASN', backref='tenant', lazy=True)
+
 
 tenant_fields = {
     'id': fields.Integer,
     'name': fields.String,
+    'asns': fields.List(fields.Nested({
+        'asn': fields.Integer,
+        'prefixes': fields.List(fields.Nested({
+            'id': fields.Integer,
+            'cidr': fields.String
+        }))
+    }))    
 }
 
 ## retrieve a list of all tenants
@@ -77,7 +87,8 @@ def TenantByName(Resource):
     
     ## CREATE
     @marshal_with(tenant_fields)
-    def post(self, tenant_name):args = request.get_json()
+    def post(self, tenant_name):
+        args = request.get_json()
         tenant = Tenant.query.filter_by(name=tenant_name).first()
         if tenant:
             return {'error': 'Tenant already exists'}, 409
