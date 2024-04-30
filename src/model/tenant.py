@@ -97,7 +97,10 @@ def TenantByName(Resource):
             new_tenant = Tenant(name=tenant_name)
             db.session.add(new_tenant)
             db.session.commit()
-            return new_tenant, 201
+
+            ## retrieve added tenant
+            tenant = Tenant.query.filter_by(name=tenant_name).first()
+            return tenant, 201
     
 
     
