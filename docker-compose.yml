@@ -1,14 +1,5 @@
 version: '3.3'
 services:
-  api:
-    build:
-      context: flask
-      dockerfile: Dockerfile
-    restart: always
-    secrets:
-      - mysql_password
-    bind:
-      - 8000:8000  
   db: 
     image: "mysql:8.3"
     restart: always
@@ -21,6 +12,17 @@ services:
       - mysql:/var/lib/mysql
     secrets:
       - mysql_password
+  api:
+    depends_on:
+      - db
+    build:
+      context: flask
+      dockerfile: Dockerfile
+    restart: always
+    secrets:
+      - mysql_password
+    bind:
+       - 8000:8000
 volumes:
   mysql:
 secrets:
