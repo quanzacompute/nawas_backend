@@ -1,10 +1,7 @@
-from src.db.connection import DBConnection
+from .models.db import DBConnection
 
 from flask import jsonify, request
 from flask_restful import Resource, fields, marshal_with, reqparse
-
-from src.model.tenant import Tenant
-
 
 db = DBConnection.get_connection()
 
@@ -21,7 +18,7 @@ class ASN(db.model):
 
 asn_fields = {
     'asn': fields.Integer,
-    'tenant_id': fields.Integer
+    'tenant_id': fields.Integer,
     'prefixes': fields.List(fields.Nested({
         'id': fields.Integer,
         'cidr': fields.String
