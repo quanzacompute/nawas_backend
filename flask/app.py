@@ -3,12 +3,12 @@ from flask import Flask
 from flask_restful import Api
 
 ## import model
-from .model.db.connection import DBConnection
+from .models import db
 from .urls import initUrls
 
 app = Flask(__name__)
 api = Api(app)
-DBConnection.init(app)
+db.init(app)
 
 initUrls(api)
 
@@ -19,4 +19,3 @@ if __name__ == "__main__":
         "ensure_ascii": False
     }
     app.run(host = "0.0.0.0")
-    DBConnection.close()
