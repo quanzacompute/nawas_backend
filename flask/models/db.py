@@ -28,8 +28,6 @@ class DBConnection:
 
         return "mysql://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,DB_HOST,DB_NAME)
 
-    def build_uri(host, db, user, password):
-        return "mysql://{}:{}@{}/{}".format(host, db, user, password)
 
     def get_connection():
         if connection is None:
