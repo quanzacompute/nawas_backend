@@ -7,9 +7,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 ## import model
 from src.db.connection import DBConnection
-from src.resources.tenant import Tenant
-from src.resources.asn import ASN
-from src.resources.prefix import Prefix
+from src.model.tenant import TenantList, TenantByID, TenantByName
+from src.model.asn import ASNList, ASNListByTenant, ASNByASN
+from src.model.prefix import PrefixList, PrefixByASN, PrefixByID 
 
 
 app = Flask(__name__)
@@ -18,11 +18,22 @@ api = Api(app)
 DBConnection.init(app)
 
 ## Register resources
+
+#tenant
 api.add_resource(TenantList, "/tenant/")
-api.add_resource(TenantByID, "/tenant/id/<int:id>")
+api.add_resource(TenantByID, "/tenant/<int:id>")
 api.add_resource(TenantByName, "/tenant/name/<string:name>")
-api.add_resource(ASN, "/asn/<int:asn>")
-api.add_resource(Prefix, "/prefix/<int:id>")
+
+#asn
+api.add_resource(ASNList, "/asn/")
+api.add_resource(ASNListByTenant, "/asn/tenant/<int:id>")
+api.add_resource(ASNByASN, "/asn/<int:asn>")
+
+#prefix
+api.add_resource(PrefixList, "/prefix/")
+api.add_resource(PrefixByASN, "/prefix/asn/<int:asn>")
+api.add_resource(PrefixByID, "/prefix/<int:id>")
+
 
 if __name__ == "__main__":
     app.config["DEBUG"] = bool(os.environ.get("DEBUG"))
