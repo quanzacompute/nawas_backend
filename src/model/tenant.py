@@ -99,7 +99,7 @@ def TenantByName(Resource):
             db.session.commit()
 
             ## retrieve added tenant
-            tenant = Tenant.query.filter_by(name=tenant_name).first()
+            tenant = Tenant.query.filter_by(name=new_tenant.name).first()
             return tenant, 201
     
 
