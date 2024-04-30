@@ -26,7 +26,7 @@ asn_fields = {
 }
 
 ## retrieve a list of all asns
-class ASNList(Resource):
+class ASNRoot(Resource):
     @marshal_with(asn_fields)
     def get(self):
         asns = ASN.query.all()

@@ -20,7 +20,7 @@ prefix_fields = {
     'cidr': fields.String
 }
 
-class PrefixList(Resource):
+class PrefixRoot(Resource):
 
     @marshal_fields(prefix_fields)
     def get(self):

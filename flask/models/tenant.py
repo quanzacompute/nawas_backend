@@ -31,7 +31,7 @@ tenant_fields = {
 }
 
 ## retrieve a list of all tenants
-class TenantList(Resource):
+class TenantRoot(Resource):
     @marshal_with(tenant_fields)
     def get(self):
         tenants = Tenant.query.all()
