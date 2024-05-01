@@ -3,7 +3,6 @@ services:
     build:
       context: flask
       dockerfile: Dockerfile
-    restart: always
     secrets:
       - db_password
     environment:
