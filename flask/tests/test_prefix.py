@@ -8,6 +8,7 @@ class TestPrefixes(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.app_context().push()
         self.app = app.test_client()
         db.create_all()
 

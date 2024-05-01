@@ -6,7 +6,8 @@ class TestTenants(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        self.app = app.test_client()
+        app.app_context().push()
+        self.app = app.test_client()        
         db.create_all()
 
     def tearDown(self):
@@ -60,3 +61,4 @@ class TestTenants(unittest.TestCase):
         response = self.app.delete('/tenant/id/1')
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(Tenant.query.get(1))
+
