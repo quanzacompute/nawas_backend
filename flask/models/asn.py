@@ -4,16 +4,16 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
 
-class ASN(db.model):
+class ASN(db.Model):
     ## metadata
     __tablename__ = 'asn'
 
     ## column
     asn = db.Column(db.Integer, primary_key=True, autoincrement=False, nullable=False)
-    tenant = db.Column(db.Integer, db.ForeignKey('tenant.id'), nullable=False, onupdate="CASCADE", ondelete="RESTRICT")
+    tenant = db.Column(db.Integer, db.ForeignKey('tenant.id', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
 
     # relationships
-    refixes = db.relationship('Prefix', backref='asn', lazy=true)
+    refixes = db.relationship('Prefix', backref='asn', lazy=True)
 
 asn_fields = {
     'asn': fields.Integer,
@@ -32,7 +32,7 @@ class ASNRoot(Resource):
         return asns, 200
 
         
-class ASNbyASN(Resource):
+class ASNByASN(Resource):
     
     ## GET
     @marshal_with(asn_fields)

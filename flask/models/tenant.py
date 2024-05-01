@@ -74,7 +74,7 @@ class TenantById(Resource):
             return {'error', 'Tenant not found'}, 404
 
 ## get or add tenants based of name
-def TenantByName(Resource):
+class TenantByName(Resource):
     ## GET
     @marshal_with(tenant_fields)
     def get(self, tenant_name):

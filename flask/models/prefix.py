@@ -4,13 +4,13 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
 
-class Prefix(db.model):
+class Prefix(db.Model):
     ## metadata
     __tablename__ = 'prefix'
 
     ## columns
     id = db.Column(db.Integer, primary_key=True)
-    asn = db.Column(db.Integer, db.ForeignKey('asn.asn'), nullable=False)
+    asn = db.Column(db.Integer, db.ForeignKey('asn.asn', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
     cidr = db.Column(db.String(100), unique=True, nullable=False)  ##ASSUMPTION: unique
 
 prefix_fields = {
@@ -21,13 +21,13 @@ prefix_fields = {
 
 class PrefixRoot(Resource):
 
-    @marshal_fields(prefix_fields)
+    @marshal_with(prefix_fields)
     def get(self):
         prefixes = Prefix.query.all()
         return prefixes, 200
     
     ## CREATE SINGLE PREFIX
-    @marshal_fields(prefix_fields)
+    @marshal_with(prefix_fields)
     def post(self):
         prefix = Prefix.query.filter_by(cidr=args.get('cidr')).first()
         if not prefix:
@@ -42,7 +42,7 @@ class PrefixRoot(Resource):
 
 class PrefixById(Resource):
 
-    @marshal_fields(prefix_fields)
+    @marshal_with(prefix_fields)
     def get(self, prefix_id):
         prefix = Prefix.get.query(prefix_id)
         if prefix:
@@ -50,7 +50,7 @@ class PrefixById(Resource):
         else:
             return {'error': 'Prefix not found'}, 404
 
-    @marshal_fields(prefix_fields)
+    @marshal_with(prefix_fields)
     ## UPDATE
     def put(self, prefix_id):
         args = get_json()
