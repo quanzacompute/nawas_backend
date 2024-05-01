@@ -13,6 +13,7 @@ services:
       - mysql:/var/lib/mysql
     secrets:
       - db_password
+      - db_root_password
   api:
     depends_on:
       - db
