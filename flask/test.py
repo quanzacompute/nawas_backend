@@ -9,10 +9,10 @@ class TestAPI(unittest.TestSuite):
     @classmethod
     def suite(cls):
         suite = unittest.TestSuite()
-        suite.addTest(unittest.makeSuite(TestTenants))
-        suite.addTest(unittest.makeSuite(TestASNs))
-        suite.addTest(unittest.makeSuite(TestPrefixes))
+        suite.addTest(unittest.makeSuite(test_tenant.TestTenants))
+        suite.addTest(unittest.makeSuite(test_asn.TestASNs))
+        suite.addTest(unittest.makeSuite(test_prefix.TestPrefixes))
 
-if __name __ == '__main__':
+if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(TestAPI.suite())
 
