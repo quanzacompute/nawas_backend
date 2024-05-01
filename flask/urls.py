@@ -5,7 +5,7 @@ from models.prefix import PrefixRoot, PrefixById
 
 
 ## Register resources into the api
-def initUrls(api):
+def loadUrls(api):
     #tenant
     api.add_resource(TenantRoot, "/tenant/")
     api.add_resource(TenantById, "/tenant/<int:id>")

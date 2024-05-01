@@ -17,9 +17,6 @@ class DBPasswordNotFoundException(Exception):
 
 app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = get_uri()
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-make_versioned
 
 db = SQLAlchemy()
 
@@ -30,8 +27,8 @@ else:
 
 make_versioned
 
-from urls import initUrls
-initUrls(api)
+from urls import loadUrls
+loadUrls(api)
 
 ## INIT
 if __name__ == "__main__":
