@@ -1,6 +1,6 @@
 import unittest
 from app import app, db
-from model.Tenant import Tenant
+from models.tenant import Tenant
 
 class TestTenants(unittest.TestCase):
     @classmethod

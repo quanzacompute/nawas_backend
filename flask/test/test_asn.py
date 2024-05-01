@@ -1,7 +1,7 @@
 import unittest
 from app import app, db
-from model.tenant import Tenant
-from model.asn import ASN
+from models.tenant import Tenant
+from models.asn import ASN
 
 class TestASNs(unittest.TestCase):
     @classmethod

@@ -1,8 +1,8 @@
 import unittest
 from app import app, db
-from model.tenant import Tenant
-from model.asn import ASN
-from model.prefix import Prefix
+from models.tenant import Tenant
+from models.asn import ASN
+from models.prefix import Prefix
 
 class TestPrefix(unittest.TestCase):
     @classmethod
