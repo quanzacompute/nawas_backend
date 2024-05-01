@@ -1,0 +1,11 @@
+services:
+  test_api:
+    build:
+      context: flask
+      dockerfile: Dockerfile
+    restart: always
+    command:
+      - python
+      - test.py
+
+    

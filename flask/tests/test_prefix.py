@@ -4,7 +4,7 @@ from models.tenant import Tenant
 from models.asn import ASN
 from models.prefix import Prefix
 
-class TestPrefix(unittest.TestCase):
+class TestPrefixes(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         app.config['TESTING'] = True
