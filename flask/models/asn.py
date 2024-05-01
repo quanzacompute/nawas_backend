@@ -1,9 +1,8 @@
-from .db import get_connection
 
 from flask import jsonify, request
 from flask_restful import Resource, fields, marshal_with, reqparse
 
-db = get_connection()
+from app import db
 
 class ASN(db.model):
     ## metadata
