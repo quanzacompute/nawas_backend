@@ -3,12 +3,7 @@ import os
 
 # testing config
 class ProductionConfig(Config):
-    def __init__(self):
-        self.SQLALCHEMY_DATABASE_URI = get_prod_uri()
-        self.DEBUG = bool(os.environ.get("DEBUG"))
-
-
-    def get_prod_uri(self):
+    def get_prod_uri():
         ## Read secrets
         DB_HOST="mysql"
         DB_NAME="nawas"
@@ -24,3 +19,11 @@ class ProductionConfig(Config):
     
         return "mysql+mysqlconnector://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,DB_HOST,DB_NAME)
     
+    SQLALCHEMY_DATABASE_URI = get_prod_uri()
+    DEBUG = bool(os.environ.get("DEBUG"))
+    
+## custom error for missing password in secrets location
+class DBPasswordNotFoundException(Exception):
+    def __init__(self, message, errors=401):
+        super().__init__(message)
+        self.errors = errors

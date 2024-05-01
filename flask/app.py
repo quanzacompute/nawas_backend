@@ -9,22 +9,16 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_continuum import make_versioned
 import conf
 
-## custom error for missing password in secrets location
-class DBPasswordNotFoundException(Exception):
-    def __init__(self, message, errors=401):
-        super().__init__(message)
-        self.errors = errors
 
 app = Flask(__name__)
 api = Api(app)
 
-db = SQLAlchemy()
+if ( os.environ.get("FLASK_ENV") == "testing" ):
+    app.config.from_object(conf.TestConfig) 
+elif ( os.environ.get("FLASK_ENV") == "production" ):
+    app.config.from_object(conf.ProductionConfig)
 
-if (bool(os.environ.get("TEST"))):
-    app.config.from_object(conf.TestConfig())
-else:
-    app.config.from_object(conf.ProductionConfig())
-
+db = SQLAlchemy(app)
 make_versioned
 
 from urls import loadUrls
@@ -32,5 +26,4 @@ loadUrls(api)
 
 ## INIT
 if __name__ == "__main__":
-    db.init_app(app)
     app.run()
