@@ -4,8 +4,8 @@ services:
       context: flask
       dockerfile: Dockerfile
     restart: always
-    command:
-      - python
-      - test.py
+    environment:
+      - TEST=1
+    command: "python -m unittest discover -s tests"
 
     

@@ -4,15 +4,13 @@ from models.tenant import Tenant
 from models.asn import ASN
 
 class TestASNs(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        cls.app = app.test_client()
+        self.app = app.test_client()
         db.create_all()
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         db.session.remove()
         db.drop_all()
 
