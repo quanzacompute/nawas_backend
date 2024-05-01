@@ -1,9 +1,9 @@
 # flask modules
 from flask import Flask
 from flask_restful import Api
+from flask_sqlalchemy import SQLAlchemy
 
-## import model
-from .urls import initUrls
+from sqlalchemy_continuum import make_versioned
 
 ## method to generate connection uri
 def build_uri():
@@ -30,12 +30,13 @@ class DBPasswordNotFoundException(Exception):
 
 app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = DBConnection.build_uri()
+app.config['SQLALCHEMY_DATABASE_URI'] = build_uri()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 make_versioned
 
 db = SQLAlchemy(app)
 
+from urls import initUrls
 initUrls(api)
 
 ## INIT

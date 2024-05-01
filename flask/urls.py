@@ -1,14 +1,14 @@
 
-from .models.tenant import TenantRoot, TenantByID, TenantByName
-from .models.asn import ASNRoot, ASNByASN
-from .models.prefix import PrefixRoot, PrefixByID 
+from models.tenant import TenantRoot, TenantById, TenantByName
+from models.asn import ASNRoot, ASNByASN
+from models.prefix import PrefixRoot, PrefixById
 
 
 ## Register resources into the api
 def initUrls(api):
     #tenant
     api.add_resource(TenantRoot, "/tenant/")
-    api.add_resource(TenantByID, "/tenant/<int:id>")
+    api.add_resource(TenantById, "/tenant/<int:id>")
     api.add_resource(TenantByName, "/tenant/name/<string:name>")
     
     #asn
@@ -17,4 +17,4 @@ def initUrls(api):
     
     #prefix
     api.add_resource(PrefixRoot, "/prefix/")
-    api.add_resource(PrefixByID, "/prefix/<int:id>")
+    api.add_resource(PrefixById, "/prefix/<int:id>")
