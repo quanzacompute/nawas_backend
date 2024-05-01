@@ -4,6 +4,10 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
 
+##########
+### DB ###
+##########
+
 class Prefix(db.Model):
     ## metadata
     __tablename__ = 'prefix'
@@ -12,6 +16,10 @@ class Prefix(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     asn = db.Column(db.Integer, db.ForeignKey('asn.asn', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
     cidr = db.Column(db.String(100), unique=True, nullable=False)  ##ASSUMPTION: unique
+
+###########
+### API ###
+###########
 
 prefix_fields = {
     'id': fields.Integer,
@@ -29,6 +37,7 @@ class PrefixRoot(Resource):
     ## CREATE SINGLE PREFIX
     @marshal_with(prefix_fields)
     def post(self):
+        args = request.get_json()
         prefix = Prefix.query.filter_by(cidr=args.get('cidr')).first()
         if not prefix:
             new_prefix = Prefix(cidr=args.get('cidr'), asn=args.get('asn'))
@@ -39,34 +48,50 @@ class PrefixRoot(Resource):
             return prefix, 201
         else:
             return {'error': 'Prefix already exists'}, 409
+    
+    ## UPDATE
+    @marshal_with(prefix_fields)
+    def put(self):
+        args = request.get_json()
+        prefix = Prefix.query.get(args.get('id'))
+        if prefix:
+            prefix.id = args.get('id', prefix.id)
+            prefix.asn = args.get('asn', prefix.asn)
+            prefix.cidr = args.get('cidr', prefix.cidr)
+            db.session.commit()
+            return prefix, 200
+        else:
+            return {'error': 'Prefix not found'}, 404
 
 class PrefixById(Resource):
-
+    
+    ## GET
     @marshal_with(prefix_fields)
-    def get(self, prefix_id):
-        prefix = Prefix.get.query(prefix_id)
+    def get(self, id):
+        prefix = Prefix.query.get(id)
         if prefix:
             return prefix, 200
         else:
             return {'error': 'Prefix not found'}, 404
 
-    @marshal_with(prefix_fields)
     ## UPDATE
-    def put(self, prefix_id):
-        args = get_json()
-        prefix = Prefix.get.query(prefix_id)
+    @marshal_with(prefix_fields)
+    def put(self, id):
+        args = request.get_json()
+        prefix = Prefix.query.get(id)
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
             prefix.cidr = args.get('cidr', prefix.cidr)
+            db.session.commit()
             return prefix, 200
         else:
             return {'error': 'Prefix not found'}, 404
 
 
     ## DELETE
-    def delete(self, prefix_id):
-        prefix = Prefix.get.query(prefix_id)
+    def delete(self, id):
+        prefix = Prefix.query.get(id)
         if prefix:
             db.session.delete(prefix)
             db.session.commit()

@@ -4,6 +4,11 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
 
+##########
+### DB ###
+##########
+
+
 class Tenant(db.Model):
     ## metadata
     __tablename__ = 'tenant'
@@ -16,6 +21,9 @@ class Tenant(db.Model):
     ## relationships
     asns = db.relationship('ASN', backref='tenant_relationship', lazy=True)
 
+##########
+### API ###
+##########
 
 tenant_fields = {
     'id': fields.Integer,
@@ -35,13 +43,34 @@ class TenantRoot(Resource):
     def get(self):
         tenants = Tenant.query.all()
         return tenants, 200
+    
+    ## CREATE
+    @marshal_with(tenant_fields)
+    def post(self):
+        args = request.get_json()
+        name = args.get('name', None)
+        if name is None:
+            return {'error': 'No Tenant Name Received'}, 400
+
+        tenant = Tenant.query.filter_by(name=name).first()
+        if tenant:
+            return {'error': 'Tenant already exists'}, 409
+        else:
+            # Creating a new tenant
+            new_tenant = Tenant(name=name)
+            db.session.add(new_tenant)
+            db.session.commit()
+
+            ## retrieve added tenant
+            tenant = Tenant.query.filter_by(name=new_tenant.name).first()
+            return tenant, 201
 
 ## get, update or delete tenants based of id
 class TenantById(Resource):
     ## GET
     @marshal_with(tenant_fields, envelope='resource')
-    def get(self, tenant_id):
-        tenant = Tenant.query.get(tenant_id)
+    def get(self, id):
+        tenant = Tenant.query.get(id)
         if tenant:
             return tenant, 200
         else:
@@ -49,9 +78,9 @@ class TenantById(Resource):
 
     ## UPDATE
     @marshal_with(tenant_fields, envelope='resource')
-    def put(self, tenant_id):
+    def put(self, id):
         args = request.get_json()
-        tenant = Tenant.query.get(tenant_id)
+        tenant = Tenant.query.get(id)
 
         if tenant:
             tenant.id = args.get('id', tenant.id)
@@ -60,11 +89,10 @@ class TenantById(Resource):
             return tenant, 200
         else:
             return {'error', 'Tenant not found'}, 404
-            
-
+    
     ## DELETE
-    def delete(self, tenant_id):
-        tenant = Tenant.query.get(tenant_id)
+    def delete(self, id):
+        tenant = Tenant.query.get(id)
         
         if tenant:
             db.session.delete(tenant)
@@ -93,7 +121,7 @@ class TenantByName(Resource):
             return {'error': 'Tenant already exists'}, 409
         else:
             # Creating a new tenant
-            new_tenant = Tenant(name=tenant_name)
+            new_tenant = Tenant(name=name)
             db.session.add(new_tenant)
             db.session.commit()
 

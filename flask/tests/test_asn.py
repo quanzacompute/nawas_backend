@@ -3,6 +3,8 @@ from app import app, db
 from models.tenant import Tenant
 from models.asn import ASN
 
+from tests import tools
+
 class TestASNs(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
@@ -15,50 +17,39 @@ class TestASNs(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def create_tenant(self, tenant_id=1):
-        tenant = Tenant(id=tenant_id, name="test_tenant{}".format(tenant_id))
-        db.session.add(tenant)
-        db.session.commit()
-        return tenant
-
-    def create_asn(self, tenant):
-        asn = ASN(asn=1, tenant_id=tenant.id)
-        db.session.add(asn)
-        db.session.commit()
-        return asn
 
 
     def test_create_asn(self):
-        tenant=self.create_tenant()
+        tenant=tools.create_tenant(db)
 
-        response = self.app.post('/asns', json={'asn': 1, 'tenant_id': tenant.id})
+        response = self.app.post('/asn/1', json={'asn': 1, 'tenant_id': tenant.id})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(ASN.query.count(), 1)
 
     def test_get_asn(self):
-        tenant = self.create_tenant()
-        asn = self.create_asn(tenant)
+        tenant = tools.create_tenant(db)
+        asn = tools.create_asn(db,tenant)
 
         response = self.app.get('/asn/1')
         self.assertEqual(response.status_code, 200)
 
     def test_update_asn(self):
-        tenant = self.create_tenant(1)
-        tenant2 = self.create_tenant(2)
-        asn = self.create_asn(tenant)
+        tenant = tools.create_tenant(db,1)
+        tenant2 = tools.create_tenant(db,2)
+        asn = tools.create_asn(db,tenant)
         
         new_data = {'asn': 1,  'tenant_id': tenant2.id}
 
-        response = self.app.post('/asn/id/1', json=new_data)
+        response = self.app.put('/asn/1', json=new_data)
         self.assertEqual(response.status_code, 200)
         updated_asn = ASN.query.get(1)
         self.assertEqual(updated_asn.tenant_id, tenant2.id)
 
     def test_delete_asn(self):
-        tenant = self.create_tenant()
-        asn = self.create_asn(tenant)
+        tenant = tools.create_tenant(db)
+        asn = tools.create_asn(db,tenant)
         
-        response = self.app.delete("/asn/id/{}".format(asn.asn))
+        response = self.app.delete("/asn/{}".format(asn.asn))
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(ASN.query.get(1))
 

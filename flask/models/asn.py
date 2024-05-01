@@ -4,6 +4,11 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
 
+##########
+### DB ###
+##########
+
+
 class ASN(db.Model):
     ## metadata
     __tablename__ = 'asn'
@@ -14,6 +19,11 @@ class ASN(db.Model):
 
     # relationships
     refixes = db.relationship('Prefix', backref='asn_relationship', lazy=True)
+
+###########
+### API ###
+###########
+
 
 asn_fields = {
     'asn': fields.Integer,
@@ -50,8 +60,9 @@ class ASNByASN(Resource):
         asn = ASN.query.get(asn)
 
         if asn:
-            asn.id = args.get('id', asn.id)
-            ans.tenant_id = args.get('tenant_id', asn.tenant_id)
+            asn.asn = args.get('asn', asn.asn)
+            asn.tenant_id = args.get('tenant_id', asn.tenant_id)
+
             db.session.commit()
             return asn, 200
         else:
@@ -60,13 +71,21 @@ class ASNByASN(Resource):
     ## CREATE
     @marshal_with(asn_fields)
     def post(self, asn):
-        asn = ASN.query.get(asn)
-        
-        if not asn:
-            asn.id = args.get('id', asn.id)
-            ans.tenant_id = args.get('tenant_id', asn.tenant_id)
+        args = request.get_json()
+        asnObj = ASN.query.get(asn)
+        if args.get('tenant_id', None) is None:
+            return {'error': 'Please provide a tenant_id to create an ASN'}, 400
+
+
+        if not asnObj:
+            new_asn = ASN(
+                asn = args.get('asn', asn),
+                tenant_id = args.get('tenant_id')
+            )
+
+            db.session.add(new_asn)
             db.session.commit()
-            return asn, 201
+            return new_asn, 201
         else:
             return {'error': 'ASN already exists'}, 409
 
