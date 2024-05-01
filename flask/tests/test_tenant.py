@@ -15,7 +15,7 @@ class TestTenants(unittest.TestCase):
         db.drop_all()
 
     def test_create_tenant(self):
-        response = self.app.post('/tenants', json={'name': 'test_tenant'})
+        response = self.app.post('/tenant', json={'name': 'test_tenant'})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Tenant.query.count(), 1)
 
@@ -33,7 +33,7 @@ class TestTenants(unittest.TestCase):
         db.session.add(tenant)
         db.session.commit()
 
-        response = self.app.get('/tenant/name/test_tenant2')
+        response = self.app.get('/tenant/name/test_tenant3')
         self.assertEqual(response.status_code, 200)
 
         t2_id = response.data['id']

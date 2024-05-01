@@ -29,24 +29,25 @@ class TestPrefixes(unittest.TestCase):
         return asn
 
     def create_prefix(self, asn, prefix_id=1, cidr="8.8.8.8/32"):
-        prefix = Prefix(id=prefix_id, asn=ans.id, cidr=cidr)
+        prefix = Prefix(id=prefix_id, asn=asn.asn, cidr=cidr)
         db.session.add(prefix)
         db.session.commit()
+        return prefix
 
     def test_create_prefix(self):
         tenant=self.create_tenant()
         asn = self.create_asn(tenant)
 
-        response = self.app.post('/prefix', json={'asn': asn.asn, cidr:'255.255.255.255/32'})
+        response = self.app.post('/prefix', json={'asn': asn.asn, 'cidr':'255.255.255.255/32'})
         self.assertEqual(response.status_code, 201)
 
-        response = self.app.post('/prefix', json={'asn': asn.asn, cidr:'0.0.0.0/0'})
+        response = self.app.post('/prefix', json={'asn': asn.asn, 'cidr':'0.0.0.0/0'})
         self.assertEqual(response.status_code, 201)
 
-        response = self.app.post('/prefix', json={'asn': asn.asn, cidr:':::::::/0'})
+        response = self.app.post('/prefix', json={'asn': asn.asn, 'cidr':':::::::/0'})
         self.assertEqual(response.status_code, 201)
 
-        response = self.app.post('/prefix', json={'asn': asn.asn, cidr:'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'})
+        response = self.app.post('/prefix', json={'asn': asn.asn, 'cidr':'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128'})
         self.assertEqual(response.status_code, 201)
 
         self.assertEqual(ASN.query.count(), 4)
@@ -64,7 +65,7 @@ class TestPrefixes(unittest.TestCase):
         asn = self.create_asn(tenant)
         prefix = self.create_prefix(asn)
         
-        new_data = {'asn': asn.asn, cidr: '8.8.8.8/24'}
+        new_data = {'asn': asn.asn, 'cidr': '8.8.8.8/24'}
 
         response = self.app.post('/prefix/id/1', json=new_data)
         self.assertEqual(response.status_code, 200)
@@ -73,7 +74,7 @@ class TestPrefixes(unittest.TestCase):
 
     def test_delete_prefix(self):
         tenant = self.create_tenant()
-        asn = self.create_ans(tenant)
+        asn = self.create_asn(tenant)
         prefix = self.create_prefix(asn)
         
         response = self.app.delete("/prefix/id/{}".format(prefix.id))

@@ -10,10 +10,10 @@ class ASN(db.Model):
 
     ## column
     asn = db.Column(db.Integer, primary_key=True, autoincrement=False, nullable=False)
-    tenant = db.Column(db.Integer, db.ForeignKey('tenant.id', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
+    tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.id', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
 
     # relationships
-    refixes = db.relationship('Prefix', backref='asn', lazy=True)
+    refixes = db.relationship('Prefix', backref='asn_relationship', lazy=True)
 
 asn_fields = {
     'asn': fields.Integer,

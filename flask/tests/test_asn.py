@@ -37,7 +37,7 @@ class TestASNs(unittest.TestCase):
 
     def test_get_asn(self):
         tenant = self.create_tenant()
-        asn = self.create_asn()
+        asn = self.create_asn(tenant)
 
         response = self.app.get('/asn/1')
         self.assertEqual(response.status_code, 200)
@@ -45,7 +45,7 @@ class TestASNs(unittest.TestCase):
     def test_update_asn(self):
         tenant = self.create_tenant(1)
         tenant2 = self.create_tenant(2)
-        ans = self.create_asn()
+        asn = self.create_asn(tenant)
         
         new_data = {'asn': 1,  'tenant_id': tenant2.id}
 
@@ -56,7 +56,7 @@ class TestASNs(unittest.TestCase):
 
     def test_delete_asn(self):
         tenant = self.create_tenant()
-        asn = self.create_ans()
+        asn = self.create_asn(tenant)
         
         response = self.app.delete("/asn/id/{}".format(asn.asn))
         self.assertEqual(response.status_code, 200)

@@ -14,7 +14,7 @@ class Tenant(db.Model):
     ##TODO: add more fields if required
 
     ## relationships
-    asns = db.relationship('ASN', backref='tenant', lazy=True)
+    asns = db.relationship('ASN', backref='tenant_relationship', lazy=True)
 
 
 tenant_fields = {
@@ -77,8 +77,8 @@ class TenantById(Resource):
 class TenantByName(Resource):
     ## GET
     @marshal_with(tenant_fields)
-    def get(self, tenant_name):
-        tenant = Tenant.query.get(name=tenant_name).first()
+    def get(self, name):
+        tenant = Tenant.query.filter_by(name=name).first()
         if tenant:
             return tenant, 200
         else:
@@ -86,9 +86,9 @@ class TenantByName(Resource):
     
     ## CREATE
     @marshal_with(tenant_fields)
-    def post(self, tenant_name):
+    def post(self, name):
         args = request.get_json()
-        tenant = Tenant.query.filter_by(name=tenant_name).first()
+        tenant = Tenant.query.filter_by(name=name).first()
         if tenant:
             return {'error': 'Tenant already exists'}, 409
         else:
