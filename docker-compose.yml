@@ -20,6 +20,8 @@ services:
       context: flask
       dockerfile: Dockerfile
     restart: always
+    environment:
+      - FLASK_ENV=production
     secrets:
       - db_password
     ports:

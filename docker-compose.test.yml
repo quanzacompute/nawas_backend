@@ -4,8 +4,13 @@ services:
       context: flask
       dockerfile: Dockerfile
     restart: always
+    secrets:
+      - db_password
     environment:
-      - TEST=1
+      - FLASK_ENV=testing
     command: "python -m unittest discover -s tests"
 
+secrets:
+  db_password:
+    file: secrets/db_password.txt
     
