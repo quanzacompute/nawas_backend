@@ -1,37 +1,53 @@
 services:
   db: 
-    image: "mysql:8.3"
+    image: "mysql:8.3.0"
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-      - MYSQL_USER=api
       - MYSQL_DATABASE=nawas
+    healthcheck:
+      test: ['CMD-SHELL', mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db_root_password)" --silent']
+      interval: 3s
+      retries: 5
+      start_period: 30s
     volumes:
-      - ./src/sql:/opt/scripts/
+      - ./mysql/init:/docker-entrypoint-initdb.d/
       - mysql:/var/lib/mysql
     secrets:
       - db_password
       - db_root_password
+    networks:
+      backnet:
+        ipv4_address: 172.16.238.3
   api:
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     build:
       context: flask
       dockerfile: Dockerfile
     restart: always
     environment:
       - FLASK_ENV=production
+      - DEBUG=true
     secrets:
       - db_password
     ports:
        - "8000:8000"
+    networks:
+      backnet:
+        ipv4_address: 172.16.238.2
 volumes:
   mysql:
 secrets:
-  db_password:
-    file: secrets/db_password.txt
   db_root_password:
     file: secrets/db_root_password.txt
-
+  db_password:
+    file: secrets/db_password.txt
+networks:
+  backnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/29"
     

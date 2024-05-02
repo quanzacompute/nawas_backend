@@ -5,7 +5,7 @@ import os
 class ProductionConfig(Config):
     def get_prod_uri():
         ## Read secrets
-        DB_HOST="mysql"
+        DB_HOST="db"
         DB_NAME="nawas"
         DB_USER="api"
         DB_PASSWORD_FILE="/run/secrets/db_password"
