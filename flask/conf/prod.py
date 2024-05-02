@@ -12,7 +12,7 @@ class ProductionConfig(Config):
         DB_PASSWORD = None
     
         with open(DB_PASSWORD_FILE) as f:
-            DB_PASSWORD = f.readlines()
+            DB_PASSWORD = f.read().replace('\n', '')
     
         if DB_PASSWORD is None:
             raise DBPasswordNotFoundException("db_password was not found in the expected location (/run/secrets/db_password)")
