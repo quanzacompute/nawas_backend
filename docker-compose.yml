@@ -6,9 +6,10 @@ services:
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
       - MYSQL_DATABASE=nawas
     healthcheck:
-      test: ['CMD-SHELL', mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db_root_password)" --silent']
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost']
+      timeout: 20s
       interval: 3s
-      retries: 5
+      retries: 10
       start_period: 30s
     volumes:
       - ./mysql/init:/docker-entrypoint-initdb.d/
