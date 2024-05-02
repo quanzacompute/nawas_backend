@@ -8,7 +8,7 @@ services:
     healthcheck:
       test: ['CMD-SHELL', 'mysqladmin ping -h localhost']
       timeout: 20s
-      interval: 3s
+      interval: 30s
       retries: 10
       start_period: 30s
     volumes:
@@ -24,6 +24,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        restart: true
     build:
       context: flask
       dockerfile: Dockerfile
