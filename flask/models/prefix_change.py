@@ -2,6 +2,7 @@ import enum
 from flask import jsonify, request, Flask
 from flask_restful import Resource, fields, marshal_with, reqparse
 from sqlalchemy import event
+from models.prefix import Prefix
 
 from app import app,db
 
@@ -26,26 +27,29 @@ class PrefixChange(db.Model):
     new_cidr = db.Column(db.String, nullable=True)
 
 ## tracks changes after a flush event (when changes are committed to db), using a flush listener to process all at once
-@event.listens_for(Prefix, 'after_flush')
-def log_prefix_changes(session, flush_context):
-    ## process inserts
-    for obj in session.new:
-        change = PrefixChange(prefix_id=obj.id, new_cidr=obj.cidr, action=ActionType.INSERT)
-        db.session.add(change)
-        app.logger.debug("Processing Prefix Insert {}".format(change))
+@event.listens_for(Prefix, 'after_insert')
+def log_prefix_insert(mapper, connection, target):
+    ## process insert
+    change = PrefixChange(prefix_id=target.id, new_cidr=target.cidr, action=ActionType.INSERT)
+    db.session.add(change)
+    app.logger.debug("Processing Prefix Insert {}".format(change))
 
-    ## process updates
-    for obj in session.dirty:
-        old_cidr = session.identity_map.get(obj._sa_instance_state.identity)[0].name
-        change = PrefixChange(prefix_id=obj.id, old_cidr=old_cidr, new_cidr=obj.cidr, action=ActionType.UPDATE)
-        db.session.add(change)
-        app.logger.debug("Processing Prefix Update {}".format(change))
+@event.listens_for(Prefix, 'after_update')
+def log_prefix_update(mapper, connection, target):
+    ## process update
+    old_cidr = connection.scalar(
+        db.select([Prefix.cidr]).where(Prefix.id == target.id)
+    )
+    change = PrefixChange(prefix_id=target.id, old_cidr=old_cidr, new_cidr=target.cidr, action=ActionType.UPDATE)
+    db.session.add(change)
+    app.logger.debug("Processing Prefix Update {}".format(change))
 
-    ## process deletes
-    for obj in session.delete:
-        change = PrefixChange(prefix_id=obj.id, old_cidr=obj.cidr, action=ActionType.DELETE)
-        db.session.add(change)
-        app.logger.debug("Processing Prefix Delete {}".format(change))
+@event.listens_for(Prefix, 'after_delete')
+def log_prefix_delete(mapper, connection, target):
+    ## process delete
+    change = PrefixChange(prefix_id=target.id, old_cidr=target.cidr, action=ActionType.DELETE)
+    db.session.add(change)
+    app.logger.debug("Processing Prefix Delete {}".format(change))
 
     db.session.commit()
 
