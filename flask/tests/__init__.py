@@ -1,16 +1,12 @@
 
 import unittest
+from app import app, db
 
-import test_tenant
-import test_asn
-import test_prefix
-
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader.loadTestsFromTestCase(test_tenant.TestTenants))
-    suite.addTest(unittest.TestLoader.loadTestsFromTestCase(test_asn.TestASNs))
-    suite.addTest(unittest.TestLoader.loadTestsFromTestCase(test_prefix.TestPrefixes))
+def nawas_test_suite():
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover('tests', pattern='test_*.py')
+    return test_suite
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    unittest.TextTestRunner(verbosity=2).run(nawas_test_suite())
 
