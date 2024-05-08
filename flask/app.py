@@ -11,8 +11,6 @@ import conf
 
 
 app = Flask(__name__)
-app.logger.debug(os.environ.get("DEBUG"))
-app.config['DEBUG'] = True
 app.logger.debug("Starting application")
 api = Api(app)
 app.logger.debug("Adding api function")

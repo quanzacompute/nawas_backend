@@ -20,7 +20,6 @@ class ProductionConfig(Config):
         return "mysql+mysqlconnector://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,DB_HOST,DB_NAME)
     
     SQLALCHEMY_DATABASE_URI = get_prod_uri()
-    DEBUG = bool(os.environ.get("DEBUG"))
     
 ## custom error for missing password in secrets location
 class DBPasswordNotFoundException(Exception):

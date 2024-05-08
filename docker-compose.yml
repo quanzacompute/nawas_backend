@@ -31,7 +31,7 @@ services:
     restart: always
     environment:
       - FLASK_ENV=production
-      - DEBUG=true
+      - FLASK_DEBUG=1
     secrets:
       - db_password
     ports:
