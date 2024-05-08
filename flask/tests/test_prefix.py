@@ -1,26 +1,13 @@
-import unittest
-from app import app, db
 from models.tenant import Tenant
 from models.asn import ASN
 from models.prefix import Prefix
 
-from tests import tools
+from tests.tools import NawasTestCase
 
-class TestPrefixes(unittest.TestCase):
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        app.app_context().push()
-        self.app = app.test_client()
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
+class TestPrefixes(tools.NawasTestCase):
     def test_create_prefix(self):
-        tenant = tools.create_tenant(db)
-        asn = tools.create_asn(db, tenant)
+        tenant = self.create_tenant()
+        asn = self.create_asn(tenant)
 
         response = self.app.post('/prefix', json={'asn': asn.asn, 'cidr':'255.255.255.255/32'})
         self.assertEqual(response.status_code, 201)
@@ -37,17 +24,17 @@ class TestPrefixes(unittest.TestCase):
         self.assertEqual(Prefix.query.count(), 4)
 
     def test_get_prefix(self):
-        tenant = tools.create_tenant(db)
-        asn = tools.create_asn(db,tenant)
-        prefix = tools.create_prefix(db,asn)
+        tenant = self.create_tenant()
+        asn = self.create_asn(tenant)
+        prefix = self.create_prefix(asn)
 
         response = self.app.get('/prefix/1')
         self.assertEqual(response.status_code, 200)
 
     def test_update_prefix(self):
-        tenant = tools.create_tenant(db)
-        asn = tools.create_asn(db,tenant)
-        prefix = tools.create_prefix(db,asn)
+        tenant = self.create_tenant()
+        asn = self.create_asn(tenant)
+        prefix = self.create_prefix(asn)
         
         new_data = {'asn': asn.asn, 'cidr': '8.8.8.8/24'}
 
@@ -57,14 +44,12 @@ class TestPrefixes(unittest.TestCase):
         self.assertEqual(updated_prefix.cidr, '8.8.8.8/24')
 
     def test_delete_prefix(self):
-        tenant = tools.create_tenant(db)
-        asn = tools.create_asn(db,tenant)
-        prefix = tools.create_prefix(db,asn)
+        tenant = self.create_tenant()
+        asn = self.create_asn(tenant)
+        prefix = self.create_prefix(asn)
         
         response = self.app.delete("/prefix/{}".format(prefix.id))
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(Prefix.query.get(1))
 
-if __name__ == '__main__':
-    unittest.main()
 

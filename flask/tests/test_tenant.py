@@ -1,20 +1,7 @@
-import unittest
-from app import app, db
 from models.tenant import Tenant
-
 from tests import tools
 
-class TestTenants(unittest.TestCase):
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        app.app_context().push()
-        self.app = app.test_client()        
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+class TestTenants(tools.NawasTestCase):
 
     def test_create_tenant(self):
         response = self.app.post('/tenant', json={'name': 'test_tenant'})
@@ -34,7 +21,7 @@ class TestTenants(unittest.TestCase):
         self.assertIn('test_tenant1', str(response.data))
 
     def test_get_tenant_by_id(self):
-        tenant = tools.create_tenant(db)
+        tenant = self.create_tenant()
 
         response = self.app.get('/tenant/name/test_tenant1')
         self.assertEqual(response.status_code, 200)
@@ -43,7 +30,7 @@ class TestTenants(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_update_tenant(self):
-        tenant = tools.create_tenant(db)
+        tenant = self.create_tenant()
 
         new_data = { 'name': 'updated_tenant' }
         response = self.app.put('/tenant/1', json=new_data)
@@ -52,7 +39,7 @@ class TestTenants(unittest.TestCase):
         self.assertEqual(updated_tenant.name, new_data['name'])
 
     def test_delete_tenant(self):
-        tenant = tools.create_tenant(db)
+        tenant = self.create_tenant()
 
         response = self.app.delete('/tenant/1')
         self.assertEqual(response.status_code, 200)
