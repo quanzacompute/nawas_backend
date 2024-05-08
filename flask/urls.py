@@ -18,3 +18,8 @@ def loadUrls(api):
     #prefix
     api.add_resource(PrefixRoot, "/prefix", "/prefix/")
     api.add_resource(PrefixById, "/prefix/<int:id>")
+
+    #prefix changes
+    api.add_resource(PrefixChangeByID, "/prefix/change/<int:id>")
+    api.add_resource(PrefixChangeByASN, "/asn/change/<int:asn>")
+    api.add_resource(PrefixChangeByTenant, "/tenant/change/<int:id>")
