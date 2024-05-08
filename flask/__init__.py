@@ -3,6 +3,9 @@ import os
 
 from flask import Flask
 from flask_restful import Api
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 def load_urls(app):
     from app.urls import loadUrls
@@ -10,7 +13,6 @@ def load_urls(app):
     loadUrls(api)
 
 def init_db(app):
-    from app.database import db
     app.logger.debug("Initialising database integration")
     db.init_app(app)
     
