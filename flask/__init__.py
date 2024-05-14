@@ -28,6 +28,7 @@ def create_app(test=False):
     
     app.logger.debug("Loading config")
     if ( test ):
+        app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         app.logger.debug("loaded testing config...")
     else:
