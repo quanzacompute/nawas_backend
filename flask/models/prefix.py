@@ -2,7 +2,7 @@ from flask import jsonify, request, Flask
 from flask_restful import Resource, fields, marshal_with, reqparse
 from sqlalchemy import event
 
-from app import app,db
+from app import db
 
 ##########
 ### DB ###
