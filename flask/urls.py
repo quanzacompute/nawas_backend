@@ -2,6 +2,7 @@
 from models.tenant import TenantRoot, TenantById, TenantByName
 from models.asn import ASNRoot, ASNByASN
 from models.prefix import PrefixRoot, PrefixById
+from models.prefix_change import PrefixChangeById, PrefixChangeByASN, PrefixChangeByTenant
 
 
 ## Register resources into the api
@@ -20,6 +21,6 @@ def loadUrls(api):
     api.add_resource(PrefixById, "/prefix/<int:id>")
 
     #prefix changes
-    api.add_resource(PrefixChangeByID, "/prefix/change/<int:id>")
+    api.add_resource(PrefixChangeById, "/prefix/change/<int:id>")
     api.add_resource(PrefixChangeByASN, "/asn/change/<int:asn>")
     api.add_resource(PrefixChangeByTenant, "/tenant/change/<int:id>")
