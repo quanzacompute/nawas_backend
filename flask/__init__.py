@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-def load_urls(app):
+def load_urls(app, api):
     from app.urls import loadUrls
     app.logger.debug("loading URLs")
     loadUrls(api)
@@ -37,7 +37,7 @@ def create_app(test=False):
     
     init_db(app)
     
-    load_urls(app)
+    load_urls(app, api)
 
     return app
 

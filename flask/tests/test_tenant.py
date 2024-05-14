@@ -1,7 +1,7 @@
-from models.tenant import Tenant
-from tests import tools
+from app.models.tenant import Tenant
+from app.tests import tools
 
-class TestTenants(tools.NawasTestCase):
+class TestTenant(tools.NawasTestCase):
 
     def test_create_tenant(self):
         response = self.app.post('/tenant', json={'name': 'test_tenant'})

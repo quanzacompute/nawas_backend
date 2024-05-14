@@ -3,7 +3,7 @@ from flask import jsonify, request, Flask
 from flask import current_app
 from flask_restful import Resource, fields, marshal_with, reqparse
 from sqlalchemy import event
-from models.prefix import Prefix
+from app.models.prefix import Prefix
 
 from app import db
 

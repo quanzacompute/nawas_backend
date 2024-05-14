@@ -1,12 +1,15 @@
 import unittest
-from app import app, db
-from models.tenant import Tenant
-from models.asn import ASN
-from models.prefix import Prefix
+from app import create_app, db
+
+from app.models.tenant import Tenant
+from app.models.asn import ASN
+from app.models.prefix import Prefix
 
 ## General tools for the testcases
 
 class NawasTestCase(unittest.TestCase):
+    
+
     ## utility functions 
     def create_tenant(self, tenant_id=1, commit=True):
         tenant = Tenant(id=tenant_id, name="test_tenant{}".format(tenant_id))
@@ -28,6 +31,7 @@ class NawasTestCase(unittest.TestCase):
 
     ## setup and teardown to use in all testcases
     def setUp(self):
+        app = create_app(test=True)
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         app.app_context().push()

@@ -1,10 +1,10 @@
-from models.tenant import Tenant
-from models.asn import ASN
-from models.prefix import Prefix
+from app.models.tenant import Tenant
+from app.models.asn import ASN
+from app.models.prefix import Prefix
 
-from tests.tools import NawasTestCase
+from app.tests import tools
 
-class TestPrefixes(tools.NawasTestCase):
+class TestPrefix(tools.NawasTestCase):
     def test_create_prefix(self):
         tenant = self.create_tenant()
         asn = self.create_asn(tenant)

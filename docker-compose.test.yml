@@ -7,7 +7,8 @@ services:
       - db_password
     environment:
       - FLASK_ENV=testing
-    command: "python -m unittest discover -s tests"
+      - FLASK_DEBUG=1
+    command: "python -m unittest run_tests"
 
 secrets:
   db_password:

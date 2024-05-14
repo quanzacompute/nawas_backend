@@ -1,11 +1,9 @@
 import unittest
-from app import app, db
-from models.tenant import Tenant
-from models.asn import ASN
-from models.prefix import Prefix
-from models.prefix_change import PrefixChange, ActionType
+from app import db
+from app.models.prefix import Prefix
+from app.models.prefix_change import PrefixChange, ActionType
 
-from tests import tools
+from app.tests import tools
 
 
 class TestPrefixChange(tools.NawasTestCase):

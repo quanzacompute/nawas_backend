@@ -1,8 +1,8 @@
 
-from models.tenant import TenantRoot, TenantById, TenantByName
-from models.asn import ASNRoot, ASNByASN
-from models.prefix import PrefixRoot, PrefixById
-from models.prefix_change import PrefixChangeById, PrefixChangeByASN, PrefixChangeByTenant
+from app.models.tenant import TenantRoot, TenantById, TenantByName
+from app.models.asn import ASNRoot, ASNByASN
+from app.models.prefix import PrefixRoot, PrefixById
+from app.models.prefix_change import PrefixChangeById, PrefixChangeByASN, PrefixChangeByTenant
 
 
 ## Register resources into the api
