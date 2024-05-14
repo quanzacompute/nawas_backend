@@ -14,7 +14,7 @@ class TestTenant(tools.NawasTestCase):
         self.assertEqual(Tenant.query.count(), 1)
 
     def test_get_tenant_by_name(self):
-        tenant = tools.create_tenant(db)
+        tenant = self.create_tenant()
 
         response = self.app.get('/tenant/name/test_tenant1')
         self.assertEqual(response.status_code, 200)

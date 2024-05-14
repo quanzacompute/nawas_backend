@@ -18,6 +18,7 @@ def init_db(app):
     
     with app.app_context():
         db.create_all()
+        app.logger.debug("Tables have been created")
 
 
 def create_app(test=False):
@@ -35,9 +36,8 @@ def create_app(test=False):
         app.config['SQLALCHEMY_DATABASE_URI'] = get_prod_uri()
         app.logger.debug("loaded config...")
     
-    init_db(app)
-    
     load_urls(app, api)
+    init_db(app)
 
     return app
 
