@@ -2,7 +2,7 @@ from app.models.tenant import Tenant
 from app.models.asn import ASN
 from app.tests import tools
 
-class TestASN(tools.NawasTestCase):
+class TestASN(tools.GeneralTestCase):
     def test_create_asn(self):
         tenant=self.create_tenant()
 

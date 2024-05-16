@@ -7,11 +7,12 @@ import json
 from parameterized import parameterized
 
 from app.tests import tools
+from app.tests.tools import doc_func, name_func
 
 
-class TestPrefixChange(tools.NawasTestCase):
+class TestPrefixChange(tools.GeneralTestCase):
 
-    def test_insert_prefix_change(self):
+    def test_trigger_insert_prefix_change(self):
         tenant = self.create_tenant(commit=False)
         asn = self.create_asn(tenant, commit=False)
         prefix = self.create_prefix(asn)
@@ -22,7 +23,7 @@ class TestPrefixChange(tools.NawasTestCase):
         # assert only inserts were made
         self.assertEqual(PrefixChange.query.count(), 1)
 
-    def test_update_prefix_change(self):
+    def test_trigger_update_prefix_change(self):
         tenant = self.create_tenant(commit=False)
         asn = self.create_asn(tenant, commit=False)
         prefix = self.create_prefix(asn)
@@ -40,7 +41,7 @@ class TestPrefixChange(tools.NawasTestCase):
         # assert two changes were made
         self.assertEqual(PrefixChange.query.count(), 2)
 
-    def test_delete_prefix_change(self):
+    def test_trigger_delete_prefix_change(self):
         tenant = self.create_tenant(commit=False)
         asn = self.create_asn(tenant, commit=False)
         prefix = self.create_prefix(asn)
@@ -59,43 +60,52 @@ class TestPrefixChange(tools.NawasTestCase):
         self.assertEqual(PrefixChange.query.filter_by(action=ActionType.INSERT).count(), 1)
 
 class TestPrefixChangeAPICall(tools.TestAPICall):
+    def setUp(self):
+        super().setUp()
+        self.tenant = self.create_tenant(commit=False)
+        self.asn = self.create_asn(self.tenant, commit=False)
+        self.prefix = self.create_prefix(self.asn)
+
+        self.before = datetime.now() + timedelta(hours=1)
+        self.after = datetime.now() - timedelta(hours=1)
+
     endpoints = [
         ["prefix", 1 ],
         ["asn", 1 ],
         ["tenant", 1 ]
     ]
 
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change(self, endpoint, id):
         data = self.get('/{}/change/{}'.format(endpoint, id))
         self.assertEqual(data[0]['prefix_id'],1)        
 
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change_before_time(self, endpoint, id):
         data = self.get('/{}/change/{}?before={}'.format(endpoint, id, self.before.isoformat()))
         self.assertEqual(data[0]['prefix_id'],1)        
     
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change_before_time_empty(self,endpoint, id):
         data = self.get('/{}/change/{}?before={}'.format(endpoint, id, self.after.isoformat()))
         self.assertEqual(len(data),0)        
 
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change_after_time(self, endpoint, id):
         data = self.get('/{}/change/{}?after={}'.format(endpoint, id, self.after.isoformat()))
         self.assertEqual(data[0]['prefix_id'],1)        
     
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change_after_time_empty(self, endpoint, id):
         data = self.get('/{}/change/{}?after={}'.format(endpoint, id, self.before.isoformat()))
         self.assertEqual(len(data),0)        
     
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change_range(self, endpoint, id):
         data = self.get('/{}/change/{}?before={}&after={}'.format(endpoint, id, self.before.isoformat(), self.after.isoformat()))
         self.assertEqual(data[0]['prefix_id'],1)        
     
-    @parameterized.expand(endpoints)
+    @parameterized.expand(endpoints, name_func=name_func, doc_func=doc_func)
     def test_get_prefix_change_range_empty(self, endpoint, id):
         data = self.get('/{}/change/{}?before={}&after={}'.format(endpoint, id, self.after.isoformat(), self.before.isoformat()))
         self.assertEqual(len(data),0)        

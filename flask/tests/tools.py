@@ -6,11 +6,20 @@ from app import create_app, db
 from app.models.tenant import Tenant
 from app.models.asn import ASN
 from app.models.prefix import Prefix
+from parameterized import parameterized
 
 ## General tools for the testcases
+def doc_func(func, num, param):
+    return "%s: %s with %s" %(num, func.__name__, param)
 
-class NawasTestCase(unittest.TestCase):
-    
+def name_func(testcase_func, param_num, param):
+    return "%s_%s" %(
+        testcase_func.__name__,
+        parameterized.to_safe_name(param.args[0])
+    )
+
+
+class GeneralTestCase(unittest.TestCase):
     ## get the db session
     def get_session(self):
         return db.session
@@ -47,29 +56,43 @@ class NawasTestCase(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-class TestDBOperation(NawasTestCase):
-    def setUp(self):
-        super().setUp()
-        self.tenant = self.create_tenant(commit=False)
-        self.asn = self.create_asn(self.tenant, commit=False)
-        self.prefix = self.create_prefix(self.asn)
-
-class TestAPICall(NawasTestCase):
+class TestAPICall(GeneralTestCase):
     ## generate a change to find
-    def setUp(self):
-        super().setUp()
-        self.tenant = self.create_tenant(commit=False)
-        self.asn = self.create_asn(self.tenant, commit=False)
-        self.prefix = self.create_prefix(self.asn)
 
-        self.before = datetime.now() + timedelta(hours=1)
-        self.after = datetime.now() - timedelta(hours=1)
-
-    def get(self, url):
+    def get(self, url, expected_status_code=200):
         response = self.app.get(url)
 
         # check if request was succesfull
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, expected_status_code)
 
         # check data
-        return json.loads(response.data)        
+        return json.loads(response.data)
+
+    def post(self, url, data, expected_status_code=201):
+        response = self.app.post(url, json=data)
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, expected_status_code)
+
+        # check data
+        return json.loads(response.data)
+    
+    def put(self, url, data, expected_status_code=200):
+        response = self.app.put(url, json=data)
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, expected_status_code)
+
+        # check data
+        return json.loads(response.data)
+
+    def delete(self, url, expected_status_code=200):
+        response = self.app.delete(url)
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, expected_status_code)
+
+        # check data
+        return json.loads(response.data)
+
+

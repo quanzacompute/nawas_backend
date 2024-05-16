@@ -4,7 +4,7 @@ from app.models.prefix import Prefix
 
 from app.tests import tools
 
-class TestPrefix(tools.NawasTestCase):
+class TestPrefix(tools.GeneralTestCase):
     def test_create_prefix(self):
         tenant = self.create_tenant(commit=False)
         asn = self.create_asn(tenant)
