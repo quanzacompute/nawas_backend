@@ -4,6 +4,7 @@ from app.models.prefix import Prefix
 from app.models.prefix_change import PrefixChange, ActionType
 from datetime import datetime, timedelta
 import json
+from parameterized import parameterized
 
 from app.tests import tools
 
@@ -57,70 +58,47 @@ class TestPrefixChange(tools.NawasTestCase):
         ## assert insert has been preserved
         self.assertEqual(PrefixChange.query.filter_by(action=ActionType.INSERT).count(), 1)
 
+class TestPrefixChangeAPICall(tools.TestAPICall):
+    endpoints = [
+        ["prefix", 1 ],
+        ["asn", 1 ],
+        ["tenant", 1 ]
+    ]
 
-class TestPrefixChangeById(tools.TestAPICall):
-        
-    def test_prefix_change_by_id(self):
-        data = self.get('/prefix/change/{}'.format(self.prefix.id))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change(self, endpoint, id):
+        data = self.get('/{}/change/{}'.format(endpoint, id))
         self.assertEqual(data[0]['prefix_id'],1)        
 
-    def test_prefix_change_by_id_before_time(self):
-        data = self.get('/prefix/change/{}?before={}'.format(self.prefix.id, self.before.isoformat()))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change_before_time(self, endpoint, id):
+        data = self.get('/{}/change/{}?before={}'.format(endpoint, id, self.before.isoformat()))
         self.assertEqual(data[0]['prefix_id'],1)        
     
-    def test_prefix_change_by_id_before_time_empty(self):
-        data = self.get('/prefix/change/{}?before={}'.format(self.prefix.id, self.after.isoformat()))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change_before_time_empty(self,endpoint, id):
+        data = self.get('/{}/change/{}?before={}'.format(endpoint, id, self.after.isoformat()))
         self.assertEqual(len(data),0)        
 
-    def test_prefix_change_by_id_after_time(self):
-        data = self.get('/prefix/change/{}?after={}'.format(self.prefix.id, self.after.isoformat()))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change_after_time(self, endpoint, id):
+        data = self.get('/{}/change/{}?after={}'.format(endpoint, id, self.after.isoformat()))
         self.assertEqual(data[0]['prefix_id'],1)        
     
-    def test_prefix_change_by_id_after_time_empty(self):
-        data = self.get('/prefix/change/{}?after={}'.format(self.prefix.id, self.before.isoformat()))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change_after_time_empty(self, endpoint, id):
+        data = self.get('/{}/change/{}?after={}'.format(self.prefix.id, self.before.isoformat()))
         self.assertEqual(len(data),0)        
     
-    def test_prefix_change_by_id_range(self):
-        data = self.get('/prefix/change/{}?before={}&after={}'.format(self.prefix.id, self.before.isoformat(), self.after.isoformat()))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change_range(self, endpoint, id):
+        data = self.get('/{}/change/{}?before={}&after={}'.format(endpoint, id, self.before.isoformat(), self.after.isoformat()))
         self.assertEqual(data[0]['prefix_id'],1)        
     
-    def test_prefix_change_by_id_range_empty(self):
-        data = self.get('/prefix/change/{}?before={}&after={}'.format(self.prefix.id, self.after.isoformat(), self.before.isoformat()))
+    @parameterized.expand(endpoints)
+    def test_get_prefix_change_range_empty(self, endpoint, id):
+        data = self.get('/{}/change/{}?before={}&after={}'.format(endpoint, id, self.after.isoformat(), self.before.isoformat()))
         self.assertEqual(len(data),0)        
-
-
-class TestPrefixChangeByASN(tools.TestAPICall):
-    
-    def test_prefix_change_by_asn(self):
-        data = self.get('/asn/change/{}'.format(self.asn.asn))
-        self.assertEqual(data[0]['prefix_id'],1)        
-
-    def test_prefix_change_by_asn_before_time(self):
-        data = self.get('/asn/change/{}?before={}'.format(self.asn.asn, self.before.isoformat()))
-        self.assertEqual(data[0]['prefix_id'],1)        
-    
-    def test_prefix_change_by_asn_before_time_empty(self):
-        data = self.get('/asn/change/{}?before={}'.format(self.asn.asn, self.after.isoformat()))
-        self.assertEqual(len(data),0)        
-
-    def test_prefix_change_by_asn_after_time(self):
-        data = self.get('/asn/change/{}?after={}'.format(self.asn.asn, self.after.isoformat()))
-        self.assertEqual(data[0]['prefix_id'],1)        
-    
-    def test_prefix_change_by_asn_after_time_empty(self):
-        data = self.get('/asn/change/{}?after={}'.format(self.asn.asn, self.before.isoformat()))
-        self.assertEqual(len(data),0)        
-    
-    def test_prefix_change_by_asn_range(self):
-        data = self.get('/asn/change/{}?before={}&after={}'.format(self.asn.asn, self.before.isoformat(), self.after.isoformat()))
-        self.assertEqual(data[0]['prefix_id'],1)        
-    
-    def test_prefix_change_by_asn_range_empty(self):
-        data = self.get('/asn/change/{}?before={}&after={}'.format(self.asn.asn, self.after.isoformat(), self.before.isoformat()))
-        self.assertEqual(len(data),0)        
-
-#class TestPrefixChangeByTenant(tools.NawasTestCase):
-
 
 if __name__ == '__main__':
     unittest.main()
