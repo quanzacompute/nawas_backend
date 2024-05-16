@@ -9,6 +9,9 @@ from app.models.prefix import Prefix
 
 class NawasTestCase(unittest.TestCase):
     
+    ## get the db session
+    def get_session(self):
+        return db.session
 
     ## utility functions 
     def create_tenant(self, tenant_id=1, commit=True):

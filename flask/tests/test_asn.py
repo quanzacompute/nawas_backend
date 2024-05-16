@@ -26,7 +26,7 @@ class TestASN(tools.NawasTestCase):
 
         response = self.app.put('/asn/1', json=new_data)
         self.assertEqual(response.status_code, 200)
-        updated_asn = ASN.query.get(1)
+        updated_asn = self.get_session().get(ASN, 1)
         self.assertEqual(updated_asn.tenant_id, tenant2.id)
 
     def test_delete_asn(self):
@@ -35,7 +35,7 @@ class TestASN(tools.NawasTestCase):
         
         response = self.app.delete("/asn/{}".format(asn.asn))
         self.assertEqual(response.status_code, 200)
-        self.assertIsNone(ASN.query.get(1))
+        self.assertIsNone(self.get_session().get(ASN,1))
 
 if __name__ == '__main__':
     unittest.main()

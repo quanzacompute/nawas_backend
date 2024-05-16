@@ -38,7 +38,7 @@ asn_fields = {
 class ASNRoot(Resource):
     @marshal_with(asn_fields)
     def get(self):
-        asns = ASN.query.all()
+        asns = db.session.get(ASN)
         return asns, 200
 
         
@@ -47,7 +47,7 @@ class ASNByASN(Resource):
     ## GET
     @marshal_with(asn_fields)
     def get(self, asn):
-        asn = ASN.query.get(asn)
+        asn = db.session.get(ASN, asn)
         if asn:
             return asn, 200
         else:
@@ -57,7 +57,7 @@ class ASNByASN(Resource):
     @marshal_with(asn_fields)
     def put(self, asn):
         args = request.get_json()
-        asn = ASN.query.get(asn)
+        asn = db.session.get(ASN, asn)
 
         if asn:
             asn.asn = args.get('asn', asn.asn)
@@ -72,7 +72,7 @@ class ASNByASN(Resource):
     @marshal_with(asn_fields)
     def post(self, asn):
         args = request.get_json()
-        asnObj = ASN.query.get(asn)
+        asnObj = db.session.get(ASN, asn)
         if args.get('tenant_id', None) is None:
             return {'error': 'Please provide a tenant_id to create an ASN'}, 400
 
@@ -91,7 +91,7 @@ class ASNByASN(Resource):
 
     ## DELETE
     def delete(self, asn):
-        asn = ASN.query.get(asn)
+        asn = db.session.get(ASN, asn)
         if asn:
             db.session.delete(asn)
             db.session.commit()
