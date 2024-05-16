@@ -41,7 +41,7 @@ tenant_fields = {
 class TenantRoot(Resource):
     @marshal_with(tenant_fields)
     def get(self):
-        tenants = Tenant.query.all()
+        tenants = db.session.get(Tenant)
         return tenants, 200
     
     ## CREATE
@@ -52,7 +52,7 @@ class TenantRoot(Resource):
         if name is None:
             return {'error': 'No Tenant Name Received'}, 400
 
-        tenant = Tenant.query.filter_by(name=name).first()
+        tenant = db.session.query(Tenant).filter(Tenant.name == name).first()
         if tenant:
             return {'error': 'Tenant already exists'}, 409
         else:
@@ -62,7 +62,7 @@ class TenantRoot(Resource):
             db.session.commit()
 
             ## retrieve added tenant
-            tenant = Tenant.query.filter_by(name=new_tenant.name).first()
+            tenant = db.session.query(Tenant).filter(Tenant.name == new_tenant.name).first()
             return tenant, 201
 
 ## get, update or delete tenants based of id
@@ -70,7 +70,7 @@ class TenantById(Resource):
     ## GET
     @marshal_with(tenant_fields, envelope='resource')
     def get(self, id):
-        tenant = Tenant.query.get(id)
+        tenant = db.session.get(Tenant,id)
         if tenant:
             return tenant, 200
         else:
@@ -80,7 +80,7 @@ class TenantById(Resource):
     @marshal_with(tenant_fields, envelope='resource')
     def put(self, id):
         args = request.get_json()
-        tenant = Tenant.query.get(id)
+        tenant = db.session.get(Tenant,id)
 
         if tenant:
             tenant.id = args.get('id', tenant.id)
@@ -92,7 +92,7 @@ class TenantById(Resource):
     
     ## DELETE
     def delete(self, id):
-        tenant = Tenant.query.get(id)
+        tenant = db.session.get(Tenant,id)
         
         if tenant:
             db.session.delete(tenant)
@@ -106,7 +106,7 @@ class TenantByName(Resource):
     ## GET
     @marshal_with(tenant_fields)
     def get(self, name):
-        tenant = Tenant.query.filter_by(name=name).first()
+        tenant = db.session.query(Tenant).filter(Tenant.name == name).first()
         if tenant:
             return tenant, 200
         else:
@@ -116,7 +116,7 @@ class TenantByName(Resource):
     @marshal_with(tenant_fields)
     def post(self, name):
         args = request.get_json()
-        tenant = Tenant.query.filter_by(name=name).first()
+        tenant = db.session.query(Tenant).filter(Tenant.name == name).first()
         if tenant:
             return {'error': 'Tenant already exists'}, 409
         else:
@@ -126,7 +126,7 @@ class TenantByName(Resource):
             db.session.commit()
 
             ## retrieve added tenant
-            tenant = Tenant.query.filter_by(name=new_tenant.name).first()
+            tenant = db.session.query(Tenant).filter(Tenant.name == new_tenant.name).first()
             return tenant, 201
     
 

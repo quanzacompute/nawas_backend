@@ -31,20 +31,20 @@ class PrefixRoot(Resource):
 
     @marshal_with(prefix_fields)
     def get(self):
-        prefixes = Prefix.query.all()
+        prefixes = db.session.get(Prefix)
         return prefixes, 200
     
     ## CREATE SINGLE PREFIX
     @marshal_with(prefix_fields)
     def post(self):
         args = request.get_json()
-        prefix = Prefix.query.filter_by(cidr=args.get('cidr')).first()
+        prefix = db.session.query(Prefix).filter(Prefix.cidr == args.get('cidr')).first()
         if not prefix:
             new_prefix = Prefix(cidr=args.get('cidr'), asn=args.get('asn'))
             db.session.add(new_prefix)
             db.session.commit()
             
-            prefix = Prefix.query.filter_by(cidr=args.get('cidr')).first()
+            prefix = db.session.query(Prefix).filter(Prefix.cidr == args.get('cidr')).first()
             return prefix, 201
         else:
             return {'error': 'Prefix already exists'}, 409
@@ -53,7 +53,7 @@ class PrefixRoot(Resource):
     @marshal_with(prefix_fields)
     def put(self):
         args = request.get_json()
-        prefix = Prefix.query.get(args.get('id'))
+        prefix = db.session.get(Prefix, args.get('id'))
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
@@ -68,7 +68,7 @@ class PrefixById(Resource):
     ## GET
     @marshal_with(prefix_fields)
     def get(self, id):
-        prefix = Prefix.query.get(id)
+        prefix = db.session.get(Prefix, id)
         if prefix:
             return prefix, 200
         else:
@@ -78,7 +78,7 @@ class PrefixById(Resource):
     @marshal_with(prefix_fields)
     def put(self, id):
         args = request.get_json()
-        prefix = Prefix.query.get(id)
+        prefix = db.session.get(Prefix,id)
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
@@ -91,7 +91,7 @@ class PrefixById(Resource):
 
     ## DELETE
     def delete(self, id):
-        prefix = Prefix.query.get(id)
+        prefix = db.session.get(Prefix,id)
         if prefix:
             db.session.delete(prefix)
             db.session.commit()

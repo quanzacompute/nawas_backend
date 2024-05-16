@@ -86,7 +86,7 @@ class PrefixChangeById(Resource):
         before = datetime.fromisoformat(requests.args.get('before', None))
         after = datetime.formisoformat(requests.args.get('after', None))
         
-        query = PrefixChange.query
+        query = db.session.query(PrefixChange)
         if before: query.filter(PrefixChange.timestamp <= before)
         if after: query.filter(PrefixChange.timestamp >= after)
 
@@ -102,9 +102,9 @@ class PrefixChangeByASN(Resource):
         after = datetime.formisoformat(requests.args.get('after', None))
 
         ## get all prefix_ids associated with provided asn
-        prefix_ids = [ prefix[0] for prefix in Prefix.query.filter_by( asn=asn ).with_entities(Prefix.id).all() ]
+        prefix_ids = [ prefix[0] for prefix in db.session.query(Prefix).filter( asn=asn ).with_entities(Prefix.id).all() ]
 
-        query = PrefixChange.query
+        query = db.session.query(PrefixChange)
         if before: query.filter(PrefixChange.timestamp <= before)
         if after: query.filter(PrefixChange.timestamp >= after)
 
@@ -123,9 +123,9 @@ class PrefixChangeByTenant(Resource):
         
         # get asns associated with tenant_id, get prefix_ids associated with asns
         asns = [ asn[0] for asn in ASN.query.filter_by(tenant_id=id).with_entities(ASN.asn).all() ]
-        prefix_ids = [ prefix[0] for prefix in Prefix.query.filter( Prefix.asn.in_( asns )).with_entities(Prefix.id).all() ]
+        prefix_ids = [ prefix[0] for prefix in db.session.query(Prefix).filter( Prefix.asn.in_( asns )).with_entities(Prefix.id).all() ]
         
-        query = PrefixChange.query
+        query = db.session.query(PrefixChange)
         if before: query.filter(PrefixChange.timestamp <= before)
         if after: query.filter(PrefixChange.timestamp >= after)
         PrefixChange.prefix_id.in_( prefix_ids )
