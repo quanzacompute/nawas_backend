@@ -1,4 +1,6 @@
 import unittest
+from datetime import datetime, timedelta
+import json
 from app import create_app, db
 
 from app.models.tenant import Tenant
@@ -44,3 +46,30 @@ class NawasTestCase(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+class TestDBOperation(NawasTestCase):
+    def setUp(self):
+        super().setUp()
+        self.tenant = self.create_tenant(commit=False)
+        self.asn = self.create_asn(self.tenant, commit=False)
+        self.prefix = self.create_prefix(self.asn)
+
+class TestAPICall(NawasTestCase):
+    ## generate a change to find
+    def setUp(self):
+        super().setUp()
+        self.tenant = self.create_tenant(commit=False)
+        self.asn = self.create_asn(self.tenant, commit=False)
+        self.prefix = self.create_prefix(self.asn)
+
+        self.before = datetime.now() + timedelta(hours=1)
+        self.after = datetime.now() - timedelta(hours=1)
+
+    def get(self, url):
+        response = self.app.get(url)
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, 200)
+
+        # check data
+        return json.loads(response.data)        
