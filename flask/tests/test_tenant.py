@@ -6,12 +6,12 @@ class TestTenant(tools.NawasTestCase):
     def test_create_tenant(self):
         response = self.app.post('/tenant', json={'name': 'test_tenant'})
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Tenant.query.count(), 1)
+        self.assertEqual(self.get_session().query(Tenant).count(), 1)
     
     def test_create_tenant_by_name(self):
         response = self.app.post('/tenant/name/test_tenant', json={})
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Tenant.query.count(), 1)
+        self.assertEqual(self.get_session().query(Tenant).count(), 1)
 
     def test_get_tenant_by_name(self):
         tenant = self.create_tenant()
@@ -35,7 +35,7 @@ class TestTenant(tools.NawasTestCase):
         new_data = { 'name': 'updated_tenant' }
         response = self.app.put('/tenant/1', json=new_data)
         self.assertEqual(response.status_code, 200)
-        updated_tenant = Tenant.query.get(1)
+        updated_tenant = self.get_session().get(Tenant, 1)
         self.assertEqual(updated_tenant.name, new_data['name'])
 
     def test_delete_tenant(self):
@@ -43,5 +43,5 @@ class TestTenant(tools.NawasTestCase):
 
         response = self.app.delete('/tenant/1')
         self.assertEqual(response.status_code, 200)
-        self.assertIsNone(Tenant.query.get(1))
+        self.assertIsNone(self.get_session().get(Tenant, 1))
 
