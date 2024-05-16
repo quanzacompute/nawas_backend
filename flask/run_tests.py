@@ -9,7 +9,7 @@ import unittest
 from tests.test_asn import TestASN
 from tests.test_tenant import TestTenant
 from tests.test_prefix import TestPrefix
-from tests.test_prefix_change import TestPrefixChange
+from tests.test_prefix_change import TestPrefixChange, TestPrefixChangeById
 
 from app import db
 
@@ -20,6 +20,7 @@ def nawas_test_suite():
     test_suite = test_loader.loadTestsFromTestCase(TestASN)
     test_suite = test_loader.loadTestsFromTestCase(TestPrefix)
     test_suite = test_loader.loadTestsFromTestCase(TestPrefixChange)
+    test_suite = test_loader.loadTestsFromTestCase(TestPrefixChangeById)
 
 
     return test_suite

@@ -2,6 +2,8 @@ import unittest
 from app import db
 from app.models.prefix import Prefix
 from app.models.prefix_change import PrefixChange, ActionType
+from datetime import datetime, timedelta
+import json
 
 from app.tests import tools
 
@@ -56,8 +58,69 @@ class TestPrefixChange(tools.NawasTestCase):
         self.assertEqual(PrefixChange.query.filter_by(action=ActionType.INSERT).count(), 1)
 
 
+class TestPrefixChangeById(tools.NawasTestCase):
+    ## generate a change to find
+    def setUp(self):
+        super().setUp()
+        self.tenant = self.create_tenant(commit=False)
+        self.asn = self.create_asn(self.tenant, commit=False)
+        self.prefix = self.create_prefix(self.asn)
 
-#class TestPrefixChangeByID(tools.NawasTestCase):
+        self.before = datetime.now() + timedelta(hours=1)
+        self.after = datetime.now() - timedelta(hours=1)
+        
+
+    def test_prefix_change_by_id(self):
+        response = self.app.get('/prefix/change/{}'.format(self.prefix.id))
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, 200)
+
+        # check data
+        data = json.loads(response.data)
+        self.assertEqual(data[0]['prefix_id'],1)        
+
+    def test_prefix_change_by_id_before_time_empty(self):
+        print("Empty test")
+        response = self.app.get('/prefix/change/{}?before={}'.format(self.prefix.id, self.after.isoformat()))
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, 200)
+
+        # check data
+        data = json.loads(response.data)
+        self.assertEqual(len(data),0)
+    
+    def test_prefix_change_by_id_before_time(self):
+        response = self.app.get('/prefix/change/{}?before={}'.format(self.prefix.id, self.before.isoformat()))
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, 200)
+
+        # check data
+        data = json.loads(response.data)
+        self.assertEqual(data[0]['prefix_id'],1)        
+
+    def test_prefix_change_by_id_after_time(self):
+        response = self.app.get('/prefix/change/{}?after={}'.format(self.prefix.id, self.after.isoformat()))
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, 200)
+
+        # check data
+        data = json.loads(response.data)
+        self.assertEqual(data[0]['prefix_id'],1)        
+
+    
+    def test_prefix_change_by_id_between_time(self):
+        response = self.app.get('/prefix/change/{}?before={}&after={}'.format(self.prefix.id, self.before.isoformat(), self.after.isoformat()))
+
+        # check if request was succesfull
+        self.assertEqual(response.status_code, 200)
+
+        # check data
+        data = json.loads(response.data)
+        self.assertEqual(data[0]['prefix_id'],1)        
 
 
 #class TestPrefixChangeByASN(tools.NawasTestCase):

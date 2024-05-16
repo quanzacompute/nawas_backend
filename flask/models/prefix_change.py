@@ -2,8 +2,9 @@ import enum
 from flask import jsonify, request, Flask
 from flask import current_app
 from flask_restful import Resource, fields, marshal_with, reqparse
-from sqlalchemy import event
+from sqlalchemy import event, desc
 from app.models.prefix import Prefix
+from datetime import datetime
 
 from app import db
 
@@ -82,13 +83,15 @@ prefix_change_fields = {
 class PrefixChangeById(Resource):
    
     @marshal_with(prefix_change_fields)
-    def get(self):
-        before = datetime.fromisoformat(requests.args.get('before', None))
-        after = datetime.formisoformat(requests.args.get('after', None))
-        
+    def get(self, id):
+        before = request.args.get('before', None)
+        after = request.args.get('after', None)
+
         query = db.session.query(PrefixChange)
-        if before: query.filter(PrefixChange.timestamp <= before)
-        if after: query.filter(PrefixChange.timestamp >= after)
+        query = query.filter(PrefixChange.prefix_id == id)
+
+        if before: query = query.filter(PrefixChange.timestamp < datetime.fromisoformat(before))
+        if after: query = query.filter(PrefixChange.timestamp > datetime.fromisoformat(after))
 
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes, 200
@@ -98,18 +101,18 @@ class PrefixChangeByASN(Resource):
     
     @marshal_with(prefix_change_fields)
     def get(self, asn):
-        before = datetime.fromisoformat(requests.args.get('before', None))
-        after = datetime.formisoformat(requests.args.get('after', None))
+        before = request.args.get('before', None)
+        after = request.args.get('after', None)
 
         ## get all prefix_ids associated with provided asn
         prefix_ids = [ prefix[0] for prefix in db.session.query(Prefix).filter( asn=asn ).with_entities(Prefix.id).all() ]
 
         query = db.session.query(PrefixChange)
-        if before: query.filter(PrefixChange.timestamp <= before)
-        if after: query.filter(PrefixChange.timestamp >= after)
+        if before: query = query.filter(PrefixChange.timestamp <= datetime.fromisoformat(before))
+        if after: query = query.filter(PrefixChange.timestamp >= datetime.fromisoformat(after))
 
         ## filter for prefix_ids associated with the provided asn
-        PrefixChange.prefix_id.in_( prefix_ids )
+        query = query.filter(PrefixChangy.prefix_id.in_( prefix_ids ))
 
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes, 200
@@ -118,17 +121,17 @@ class PrefixChangeByTenant(Resource):
     
     @marshal_with(prefix_change_fields)
     def get(self, id):
-        before = datetime.fromisoformat(requests.args.get('before', None))
-        after = datetime.formisoformat(requests.args.get('after', None))
+        before = request.args.get('before', None)
+        after = request.args.get('after', None)
         
         # get asns associated with tenant_id, get prefix_ids associated with asns
         asns = [ asn[0] for asn in ASN.query.filter_by(tenant_id=id).with_entities(ASN.asn).all() ]
         prefix_ids = [ prefix[0] for prefix in db.session.query(Prefix).filter( Prefix.asn.in_( asns )).with_entities(Prefix.id).all() ]
         
         query = db.session.query(PrefixChange)
-        if before: query.filter(PrefixChange.timestamp <= before)
-        if after: query.filter(PrefixChange.timestamp >= after)
-        PrefixChange.prefix_id.in_( prefix_ids )
+        if before: query = query.filter(PrefixChange.timestamp <= datetime.fromisoformat(before))
+        if after: query = query.filter(PrefixChange.timestamp >= datetime.fromisoformat(after))
+        query = query.filter(PrefixChange.prefix_id.in_( prefix_ids ))
 
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes
