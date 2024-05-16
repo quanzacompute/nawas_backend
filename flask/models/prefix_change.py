@@ -23,36 +23,49 @@ class PrefixChange(db.Model):
     ## columns
     timestamp = db.Column( db.DateTime, nullable=False, server_default=db.func.now(), primary_key=True )
     prefix_id = db.Column( db.Integer, db.ForeignKey('prefix.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False, primary_key=True)
-    action = db.Column( db.Enum(ActionType) )
+    action = db.Column( db.Enum(ActionType), primary_key=True )
     old_cidr = db.Column(db.String(100), nullable=True)
     new_cidr = db.Column(db.String(100), nullable=True)
+
+
+    ## inserts a row into prefix_change table using the execute method of connection, to work around sessions in event listeners
+    def insert_with_execute(self,conn):
+        return conn.execute(PrefixChange.__table__.insert().values(
+            prefix_id=self.prefix_id,
+            old_cidr=self.old_cidr,
+            new_cidr=self.new_cidr,
+            action=self.action
+        ))
+
+    def __repr__(self):
+        return str(self.__dict__)
+
 
 ## tracks changes after a flush event (when changes are committed to db)
 @event.listens_for(Prefix, 'after_insert')
 def log_prefix_insert(mapper, connection, target):
     ## process insert
     change = PrefixChange(prefix_id=target.id, new_cidr=target.cidr, action=ActionType.INSERT)
-    db.session.add(change)
+    change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Insert {}".format(change))
 
 @event.listens_for(Prefix, 'after_update')
 def log_prefix_update(mapper, connection, target):
     ## process update
-    old_cidr = connection.scalar(
-        db.select([Prefix.cidr]).where(Prefix.id == target.id)
-    )
+    old_cidr = connection.scalars(
+        db.select( Prefix.cidr ).filter_by(id=target.id)
+    ).first()
     change = PrefixChange(prefix_id=target.id, old_cidr=old_cidr, new_cidr=target.cidr, action=ActionType.UPDATE)
-    db.session.add(change)
+    change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Update {}".format(change))
 
 @event.listens_for(Prefix, 'after_delete')
 def log_prefix_delete(mapper, connection, target):
     ## process delete
     change = PrefixChange(prefix_id=target.id, old_cidr=target.cidr, action=ActionType.DELETE)
-    db.session.add(change)
+    change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Delete {}".format(change))
 
-    db.session.commit()
 
 #########
 ## API ##

@@ -17,7 +17,7 @@ class TestPrefixChange(tools.NawasTestCase):
         self.assertEqual(PrefixChange.query.filter_by(action=ActionType.INSERT).count(), 1)
 
         # assert only inserts were made
-        self.assertEqual(PrefixChange.query.any().count(), 1)
+        self.assertEqual(PrefixChange.query.count(), 1)
 
     def test_update_prefix_change(self):
         tenant = self.create_tenant(commit=False)
@@ -35,7 +35,7 @@ class TestPrefixChange(tools.NawasTestCase):
         self.assertEqual(PrefixChange.query.filter_by(action=ActionType.UPDATE).count(), 1)
 
         # assert two changes were made
-        self.assertEqual(PrefixChange.query.any().count(), 2)
+        self.assertEqual(PrefixChange.query.count(), 2)
 
     def test_delete_prefix_change(self):
         tenant = self.create_tenant(commit=False)

@@ -1,5 +1,5 @@
 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
