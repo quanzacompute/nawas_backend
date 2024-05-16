@@ -87,7 +87,7 @@ class TestPrefixChangeAPICall(tools.TestAPICall):
     
     @parameterized.expand(endpoints)
     def test_get_prefix_change_after_time_empty(self, endpoint, id):
-        data = self.get('/{}/change/{}?after={}'.format(self.prefix.id, self.before.isoformat()))
+        data = self.get('/{}/change/{}?after={}'.format(endpoint, id, self.before.isoformat()))
         self.assertEqual(len(data),0)        
     
     @parameterized.expand(endpoints)
