@@ -41,7 +41,7 @@ tenant_fields = {
 class TenantRoot(Resource):
     @marshal_with(tenant_fields)
     def get(self):
-        tenants = db.session.get(Tenant)
+        tenants = Tenant.query.all()
         return tenants, 200
     
     ## CREATE

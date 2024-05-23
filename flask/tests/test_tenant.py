@@ -38,43 +38,53 @@ class TestTenant(tools.GeneralTestCase):
 class TestTenantAPI(tools.TestAPICall):
 
     data = [
-        [ "id", "/tenant", {'name': 'test_tenant1'} ],
-        [ "name", "/tenant/name/test_tenant1", {} ]
+        [ "id", "/tenant", {'name': 'test_tenant1'}, 200 ],
+        [ "name", "/tenant/name/test_tenant1", {}, 404 ]
     ]
 
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)
-    def test_create_tenant(self, test_name, endpoint, payload):
-        response = self.post(endpoint, json=payload)
+    def test_create_tenant(self, test_name, endpoint, payload, exp_code):
+        response = self.post(endpoint, data=payload)
         self.assertEqual(self.get_session().query(Tenant).count(), 1)
     
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)
-    def test_create_tenant_exists(self, test_name, endpoint, payload):
-        response = self.post(endpoint, json=payload, expected_status_code=409)
-        self.assertEqual(self.get_session().query(Tenant).count(), 0)
+    def test_create_tenant_exists(self, test_name, endpoint, payload, exp_code):
+        self.create_tenant(tenant_id=1, tenant_name='test_tenant1')
+
+        response = self.post(endpoint, data=payload, expected_status_code=409)
+        self.assertEqual(self.get_session().query(Tenant).count(), 1)
     
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)
-    def test_get_tenant(self, test_name, endpoint, payload):
+    def test_get_tenant(self, test_name, endpoint, payload, exp_code):
         tenant = self.create_tenant()
 
         response = self.get(endpoint)
         self.assertIn('test_tenant1', str(response))
+
+    def test_get_tenant_root(self):
+        tenant = self.create_tenant(tenant_id=1)
+        tenant = self.create_tenant(tenant_id=2)
+
+        response = self.get('/tenant')
+        self.assertEquals(len(response), 2)
+
     
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)
-    def test_get_tenant_not_exists(self, test_name, endpoint, payload):
-        response = self.get(endpoint, expected_status_code=404)
+    def test_get_tenant_not_exists(self, test_name, endpoint, payload, exp_code):
+        response = self.get(endpoint, expected_status_code=exp_code)
 
     def test_update_tenant(self):
         tenant = self.create_tenant()
 
         new_data = { 'name': 'updated_tenant' }
-        data = self.put('/tenant/1', json=new_data)
+        data = self.put('/tenant/1', data=new_data)
         
         updated_tenant = self.get_session().get(Tenant, 1)  
         self.assertEqual(updated_tenant.name, new_data['name'])
    
     def test_update_tenant_not_exists(self):
         new_data = { 'name': 'updated_tenant' }
-        data = self.put('/tenant/1', json=new_data, expected_status_code=404)
+        data = self.put('/tenant/1', data=new_data, expected_status_code=404)
 
     def test_delete_tenant(self):
         tenant = self.create_tenant()

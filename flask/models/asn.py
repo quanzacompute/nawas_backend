@@ -1,8 +1,10 @@
 
+from sqlalchemy.exc import IntegrityError
 from flask import jsonify, request, current_app
 from flask_restful import Resource, fields, marshal_with, reqparse
 
 from app import db
+from app.models.tenant import Tenant 
 
 ##########
 ### DB ###
@@ -18,7 +20,7 @@ class ASN(db.Model):
     tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.id', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
 
     # relationships
-    refixes = db.relationship('Prefix', backref='asn_relationship', lazy=True)
+    prefixes = db.relationship('Prefix', backref='asn_relationship', lazy=True)
 
 ###########
 ### API ###
@@ -38,7 +40,7 @@ asn_fields = {
 class ASNRoot(Resource):
     @marshal_with(asn_fields)
     def get(self):
-        asns = db.session.get(ASN)
+        asns = ASN.query.all()
         return asns, 200
 
         
@@ -62,6 +64,9 @@ class ASNByASN(Resource):
         if asn:
             asn.asn = args.get('asn', asn.asn)
             asn.tenant_id = args.get('tenant_id', asn.tenant_id)
+
+            if not db.session.get(Tenant, asn.tenant_id):
+                return {'error': 'IntegrityError: tenant_id({}) was not found'.format(asn.tenant_id)}, 409
 
             db.session.commit()
             return asn, 200
@@ -93,8 +98,12 @@ class ASNByASN(Resource):
     def delete(self, asn):
         asn = db.session.get(ASN, asn)
         if asn:
-            db.session.delete(asn)
-            db.session.commit()
+            try :
+                db.session.delete(asn)
+                db.session.commit()
+            except IntegrityError as e:
+                db.session.rollback()
+                return {'error': str(e) }, 409
         else:
             return {'error': 'ASN not found'}, 404
 
