@@ -3,6 +3,7 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 from sqlalchemy import event
 
 from app import db
+from app.models.asn import ASN
 
 ##########
 ### DB ###
@@ -31,14 +32,16 @@ class PrefixRoot(Resource):
 
     @marshal_with(prefix_fields)
     def get(self):
-        prefixes = db.session.get(Prefix)
+        prefixes = Prefix.query.all()
         return prefixes, 200
     
     ## CREATE SINGLE PREFIX
     @marshal_with(prefix_fields)
     def post(self):
         args = request.get_json()
+        prefix = False
         prefix = db.session.query(Prefix).filter(Prefix.cidr == args.get('cidr')).first()
+
         if not prefix:
             new_prefix = Prefix(cidr=args.get('cidr'), asn=args.get('asn'))
             db.session.add(new_prefix)
@@ -54,6 +57,11 @@ class PrefixRoot(Resource):
     def put(self):
         args = request.get_json()
         prefix = db.session.get(Prefix, args.get('id'))
+        
+        if args.get('asn', False):
+            if not db.session.get(ASN, args.get('asn')):
+                return {'error': 'IntegrityError: asn({}) was not found'.format(args.get('asn', prefix.asn))}, 409
+
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
@@ -79,6 +87,11 @@ class PrefixById(Resource):
     def put(self, id):
         args = request.get_json()
         prefix = db.session.get(Prefix,id)
+        
+        if args.get('asn', False):
+            if not db.session.get(ASN, args.get('asn')):
+                return {'error': 'IntegrityError: asn({}) was not found'.format(args.get('asn', prefix.asn))}, 409
+
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
