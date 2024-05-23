@@ -66,7 +66,7 @@ class TestTenantAPI(tools.TestAPICall):
         tenant = self.create_tenant(tenant_id=2)
 
         response = self.get('/tenant')
-        self.assertEquals(len(response), 2)
+        self.assertEqual(len(response), 2)
 
     
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)

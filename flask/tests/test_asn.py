@@ -58,10 +58,10 @@ class TestASNAPI(tools.TestAPICall):
         tenant = self.create_tenant(commit=False)
         asn1 = self.create_asn(tenant, asn_id=1)
         asn2 = self.create_asn(tenant, asn_id=2)
-        self.assertNotEquals(asn1.asn, asn2.asn)
+        self.assertNotEqual(asn1.asn, asn2.asn)
 
         response = self.get(endpoint)
-        self.assertEquals(len(response), expected_size)
+        self.assertEqual(len(response), expected_size)
     
     @parameterized.expand(get_data, doc_func=doc_func, name_func=name_func)
     def test_get_asn_not_exists(self, test_name, endpoint, expected_size, exp_code):

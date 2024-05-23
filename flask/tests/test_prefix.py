@@ -78,7 +78,7 @@ class TestPrefixAPI(tools.TestAPICall):
         data = { "asn": 1, "cidr": "7.7.7.7/32" }
 
         response = self.post('/prefix', data=data)
-        self.assertEquals(self.get_session().query(Prefix).count(), 1)
+        self.assertEqual(self.get_session().query(Prefix).count(), 1)
 
     def test_create_prefix_exists(self):
         t = self.create_tenant(commit=False)
@@ -87,7 +87,7 @@ class TestPrefixAPI(tools.TestAPICall):
         data = { "asn": 1, "cidr": "8.8.8.8/32" }
 
         response = self.post('/prefix', data=data, expected_status_code=409)
-        self.assertEquals(self.get_session().query(Prefix).count(), 1)
+        self.assertEqual(self.get_session().query(Prefix).count(), 1)
 
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)
     def test_update_prefix(self, test_name, endpoint, data):
@@ -96,8 +96,8 @@ class TestPrefixAPI(tools.TestAPICall):
         p = self.create_prefix(a, cidr="7.7.7.7/32")
 
         response = self.put(endpoint, data=data)
-        self.assertEquals(p.cidr, response["cidr"])
-        self.assertEquals(p.id, response["id"])
+        self.assertEqual(p.cidr, response["cidr"])
+        self.assertEqual(p.id, response["id"])
 
     @parameterized.expand(data, doc_func=doc_func, name_func=name_func)
     def test_update_prefix_not_exists(self, test_name, endpoint, data):
@@ -121,7 +121,7 @@ class TestPrefixAPI(tools.TestAPICall):
         p = self.create_prefix(a)
         
         response = self.delete('/prefix/1')
-        self.assertEquals(self.get_session().query(Prefix).count(), 0)
+        self.assertEqual(self.get_session().query(Prefix).count(), 0)
     
     def test_delete_prefix(self):
         t = self.create_tenant(commit=False)
@@ -129,6 +129,6 @@ class TestPrefixAPI(tools.TestAPICall):
         p = self.create_prefix(a)
         
         response = self.delete('/prefix/2', expected_status_code=404)
-        self.assertEquals(self.get_session().query(Prefix).count(), 1)
+        self.assertEqual(self.get_session().query(Prefix).count(), 1)
 
 
