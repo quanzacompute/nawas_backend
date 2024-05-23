@@ -25,8 +25,8 @@ class GeneralTestCase(unittest.TestCase):
         return db.session
 
     ## utility functions 
-    def create_tenant(self, tenant_id=1, commit=True):
-        tenant = Tenant(id=tenant_id, name="test_tenant{}".format(tenant_id))
+    def create_tenant(self, tenant_id=1, tenant_name="test_tenant{}", commit=True):
+        tenant = Tenant(id=tenant_id, name=tenant_name.format(tenant_id))
         db.session.add(tenant)
         if commit: db.session.commit()
         return tenant

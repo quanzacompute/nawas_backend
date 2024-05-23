@@ -16,15 +16,24 @@ class TestTenant(tools.GeneralTestCase):
         except IntegrityError as e:
             self.assertTrue(True)
 
-#    def test_unique_name(self):
-#
-#    def test_insert(self):
-#
-#    def test_update(self):
-#
-#    def test_delete(self):
-#
+    def test_unique_name(self):
+        self.create_tenant(tenant_name="test123")
+        try:
+            self.create_tenant(tenant_name="test123")
+            self.assertTrue(False)
+        except IntegrityError as e:
+            self.assertTrue(True)
 
+    def test_update(self):
+        tenant = self.create_tenant()
+
+        tenant.name="test123"
+        self.get_session().commit() 
+
+    def test_delete(self):
+        tenant = self.create_tenant()
+        self.get_session().delete(tenant)
+        self.get_session().commit()
 
 class TestTenantAPI(tools.TestAPICall):
 
