@@ -8,7 +8,7 @@ from app import db
 ### DB ###
 ##########
 
-
+## database model representing a tenant object
 class Tenant(db.Model):
     ## metadata
     __tablename__ = 'tenant'
@@ -25,6 +25,7 @@ class Tenant(db.Model):
 ### API ###
 ##########
 
+## api fields
 tenant_fields = {
     'id': fields.Integer,
     'name': fields.String,

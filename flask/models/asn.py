@@ -10,7 +10,7 @@ from app.models.tenant import Tenant
 ### DB ###
 ##########
 
-
+## Database model representing the ASN object
 class ASN(db.Model):
     ## metadata
     __tablename__ = 'asn'
@@ -26,7 +26,7 @@ class ASN(db.Model):
 ### API ###
 ###########
 
-
+## api fields for ASN
 asn_fields = {
     'asn': fields.Integer,
     'tenant_id': fields.Integer,
@@ -43,7 +43,7 @@ class ASNRoot(Resource):
         asns = ASN.query.all()
         return asns, 200
 
-        
+## interact with sinle ASN based on unique asn field
 class ASNByASN(Resource):
     
     ## GET

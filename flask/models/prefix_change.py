@@ -18,11 +18,13 @@ from app import db
 ### MODEL ###
 #############
 
+## Enum representing different possible actions
 class ActionType(enum.Enum):
     INSERT = 'INSERT'
     UPDATE = 'UPDATE'
     DELETE = 'DELETE'
 
+## Database model representing a change to prefixes
 class PrefixChange(db.Model):
     ## metadata
     __tablename__ = 'prefix_change'
@@ -34,7 +36,6 @@ class PrefixChange(db.Model):
     old_cidr = db.Column(db.String(100), nullable=True)
     new_cidr = db.Column(db.String(100), nullable=True)
 
-
     ## inserts a row into prefix_change table using the execute method of connection, to work around sessions in event listeners
     def insert_with_execute(self,conn):
         return conn.execute(PrefixChange.__table__.insert().values(
@@ -44,6 +45,7 @@ class PrefixChange(db.Model):
             action=self.action
         ))
 
+    ## string representation
     def __repr__(self):
         return str(self.__dict__)
 
@@ -78,6 +80,7 @@ def log_prefix_delete(mapper, connection, target):
 ## API ##
 #########
 
+## API fields
 prefix_change_fields = {
     'timestamp': fields.DateTime(dt_format='iso8601'),
     'prefix_id': fields.Integer,
@@ -86,6 +89,7 @@ prefix_change_fields = {
     'new_cidr': fields.String
 }
 
+## get prefix changes by prefix
 class PrefixChangeById(Resource):
    
     @marshal_with(prefix_change_fields)
@@ -102,7 +106,7 @@ class PrefixChangeById(Resource):
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes, 200
 
-
+## get prefix changes per asn
 class PrefixChangeByASN(Resource):
     
     @marshal_with(prefix_change_fields)
@@ -123,6 +127,7 @@ class PrefixChangeByASN(Resource):
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes, 200
 
+## get prefix changes per tenant
 class PrefixChangeByTenant(Resource):
     
     @marshal_with(prefix_change_fields)

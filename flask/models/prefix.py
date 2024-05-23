@@ -9,6 +9,7 @@ from app.models.asn import ASN
 ### DB ###
 ##########
 
+## database model representing prefixes
 class Prefix(db.Model):
     ## metadata
     __tablename__ = 'prefix'
@@ -22,12 +23,14 @@ class Prefix(db.Model):
 ### API ###
 ###########
 
+## API Fieldds
 prefix_fields = {
     'id': fields.Integer,
     'asn': fields.Integer,
     'cidr': fields.String
 }
 
+## Get all prefixes or create/update a prefix based on data in a json payload
 class PrefixRoot(Resource):
 
     @marshal_with(prefix_fields)
@@ -71,6 +74,7 @@ class PrefixRoot(Resource):
         else:
             return {'error': 'Prefix not found'}, 404
 
+## Interact with a prefix based on its ID
 class PrefixById(Resource):
     
     ## GET

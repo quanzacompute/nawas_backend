@@ -7,11 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+## load urls from the urls file, using this method to prevent premature loading of the models
 def load_urls(app, api):
     from app.urls import loadUrls
     app.logger.debug("loading URLs")
     loadUrls(api)
 
+## initialize database and create all tables if necessary
 def init_db(app):
     app.logger.debug("Initialising database integration")
     db.init_app(app)
@@ -20,7 +22,10 @@ def init_db(app):
         db.create_all()
         app.logger.debug("Tables have been created")
 
-
+## start the app and initialize database and urls
+#             test       Boolean      starts the application using test configuration (with a sqlite database in memory)
+#
+# @returns    app        Object       object containing the flask application
 def create_app(test=False):
     app = Flask(__name__)
     app.logger.debug("Starting application")
@@ -41,6 +46,9 @@ def create_app(test=False):
 
     return app
 
+## production configuration
+#  @throws  DBPasswordNotFoundException if the database password is not present in /run/secrets
+#  @returns connection string for mysql database
 def get_prod_uri():
     ## Read secrets
     DB_HOST="db"
