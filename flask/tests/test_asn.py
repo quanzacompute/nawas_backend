@@ -50,7 +50,7 @@ class TestASNAPI(tools.TestAPICall):
     
     get_data = [
         [ "root", "/asn", 2, 200 ],
-        [ "asn", "/asn/1", 3, 404 ]
+        [ "asn", "/asn/1", 4, 404 ]
     ]
     
     @parameterized.expand(get_data, doc_func=doc_func, name_func=name_func)
@@ -70,7 +70,7 @@ class TestASNAPI(tools.TestAPICall):
     def test_create_asn(self):
         tenant = self.create_tenant()
         
-        response = self.post('/asn/1', {'tenant_id': tenant.id })
+        response = self.post('/asn/1', {'name': 'test_asn_post', 'tenant_id': tenant.id })
         self.assertEqual(self.get_session().query(ASN).count(), 1)
 
     def test_create_asn_exists(self):

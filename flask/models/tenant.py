@@ -31,6 +31,7 @@ tenant_fields = {
     'name': fields.String,
     'asns': fields.List(fields.Nested({
         'asn': fields.Integer,
+        'name': fields.String,
         'prefixes': fields.List(fields.Nested({
             'id': fields.Integer,
             'cidr': fields.String

@@ -17,6 +17,7 @@ class ASN(db.Model):
 
     ## column
     asn = db.Column(db.Integer, primary_key=True, autoincrement=False, nullable=False)
+    name = db.Column(db.String, nullable=False)
     tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.id', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
 
     # relationships
@@ -29,6 +30,7 @@ class ASN(db.Model):
 ## api fields for ASN
 asn_fields = {
     'asn': fields.Integer,
+    'name': fields.String,
     'tenant_id': fields.Integer,
     'prefixes': fields.List(fields.Nested({
         'id': fields.Integer,
@@ -63,6 +65,7 @@ class ASNByASN(Resource):
 
         if asn:
             asn.asn = args.get('asn', asn.asn)
+            asn.name = args.get('name', asn.name)
             asn.tenant_id = args.get('tenant_id', asn.tenant_id)
 
             if not db.session.get(Tenant, asn.tenant_id):
@@ -85,6 +88,7 @@ class ASNByASN(Resource):
         if not asnObj:
             new_asn = ASN(
                 asn = args.get('asn', asn),
+                name = args.get('name'),
                 tenant_id = args.get('tenant_id')
             )
 

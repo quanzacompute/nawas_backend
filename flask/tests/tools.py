@@ -31,14 +31,14 @@ class GeneralTestCase(unittest.TestCase):
         if commit: db.session.commit()
         return tenant
     
-    def create_asn(self, tenant, asn_id=1, commit=True):
-        asn = ASN(asn=asn_id, tenant_id=tenant.id)
+    def create_asn(self, tenant, asn_id=1, asn_name="test_asn{}", commit=True):
+        asn = ASN(asn=asn_id, tenant_id=tenant.id, name=asn_name.format(asn_id))
         db.session.add(asn)
         if commit: db.session.commit()
         return asn
     
-    def create_prefix(self, asn, prefix_id=1, cidr="8.8.8.8/32", commit=True):
-        prefix = Prefix(id=prefix_id, asn=asn.asn, cidr=cidr)
+    def create_prefix(self, asn, prefix_id=1, prefix_name="test_prefix{}", cidr="8.8.8.8/32", commit=True):
+        prefix = Prefix(id=prefix_id, asn=asn.asn, cidr=cidr, name=prefix_name.format(prefix_id))
         db.session.add(prefix)
         if commit: db.session.commit()
         return prefix

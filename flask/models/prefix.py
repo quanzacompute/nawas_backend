@@ -16,6 +16,7 @@ class Prefix(db.Model):
 
     ## columns
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=True)
     asn = db.Column(db.Integer, db.ForeignKey('asn.asn', onupdate="CASCADE", ondelete="RESTRICT"), nullable=False)
     cidr = db.Column(db.String(100), unique=True, nullable=False)  ##ASSUMPTION: unique
 
@@ -26,6 +27,7 @@ class Prefix(db.Model):
 ## API Fieldds
 prefix_fields = {
     'id': fields.Integer,
+    'name': fields.String,
     'asn': fields.Integer,
     'cidr': fields.String
 }
@@ -46,7 +48,7 @@ class PrefixRoot(Resource):
         prefix = db.session.query(Prefix).filter(Prefix.cidr == args.get('cidr')).first()
 
         if not prefix:
-            new_prefix = Prefix(cidr=args.get('cidr'), asn=args.get('asn'))
+            new_prefix = Prefix(cidr=args.get('cidr'), asn=args.get('asn'), name=args.get('name'))
             db.session.add(new_prefix)
             db.session.commit()
             
@@ -68,6 +70,7 @@ class PrefixRoot(Resource):
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
+            prefix.name = args.get('name', prefix.name)
             prefix.cidr = args.get('cidr', prefix.cidr)
             db.session.commit()
             return prefix, 200
@@ -99,6 +102,7 @@ class PrefixById(Resource):
         if prefix:
             prefix.id = args.get('id', prefix.id)
             prefix.asn = args.get('asn', prefix.asn)
+            prefix.name = args.get('name', prefix.name)
             prefix.cidr = args.get('cidr', prefix.cidr)
             db.session.commit()
             return prefix, 200
