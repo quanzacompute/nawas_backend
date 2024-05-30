@@ -42,10 +42,12 @@ It also tracks changes to prefix using the PrefixChange object.
 
 These objects interact with each other as follows:
 
-![NBIP Stack - Data model(1)](https://github.com/RSloeserwij/nawas_stack/assets/20596929/7b0fbd22-ca2b-4615-94eb-5c738d6df8ab)
+![NBIP Stack - Data model(2)](https://github.com/quanzacompute/nawas_backend/assets/171254481/d06ed732-adca-43f7-82a3-6f472d9f5372)
 
 ### Tenant
 Tenant represents the member which owns the different ASN and prefixes. This is a top level object used to aggregate all the different object belonging to it.
+
+It can be retrieved as a list, and individually by either name or id.
 
 ### ASN
 ### Prefix
