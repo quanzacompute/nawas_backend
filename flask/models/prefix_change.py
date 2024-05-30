@@ -31,7 +31,8 @@ class PrefixChange(db.Model):
 
     ## columns
     timestamp = db.Column( db.DateTime, nullable=False, server_default=db.func.now(), primary_key=True )
-    prefix_id = db.Column( db.Integer, db.ForeignKey('prefix.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False, primary_key=True)
+    prefix_id = db.Column( db.Integer, db.ForeignKey('prefix.id'), nullable=False, primary_key=True)
+    prefix_name = db.Column (db.String(100), nullable=True
     action = db.Column( db.Enum(ActionType), primary_key=True )
     old_cidr = db.Column(db.String(100), nullable=True)
     new_cidr = db.Column(db.String(100), nullable=True)
@@ -54,7 +55,7 @@ class PrefixChange(db.Model):
 @event.listens_for(Prefix, 'after_insert')
 def log_prefix_insert(mapper, connection, target):
     ## process insert
-    change = PrefixChange(prefix_id=target.id, new_cidr=target.cidr, action=ActionType.INSERT)
+    change = PrefixChange(prefix_id=target.id, new_cidr=target.cidr, name=target.name, action=ActionType.INSERT)
     change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Insert {}".format(change))
 
@@ -64,14 +65,14 @@ def log_prefix_update(mapper, connection, target):
     old_cidr = connection.scalars(
         db.select( Prefix.cidr ).filter_by(id=target.id)
     ).first()
-    change = PrefixChange(prefix_id=target.id, old_cidr=old_cidr, new_cidr=target.cidr, action=ActionType.UPDATE)
+    change = PrefixChange(prefix_id=target.id, old_cidr=old_cidr, new_cidr=target.cidr, name=target.name, action=ActionType.UPDATE)
     change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Update {}".format(change))
 
 @event.listens_for(Prefix, 'after_delete')
 def log_prefix_delete(mapper, connection, target):
     ## process delete
-    change = PrefixChange(prefix_id=target.id, old_cidr=target.cidr, action=ActionType.DELETE)
+    change = PrefixChange(prefix_id=target.id, old_cidr=target.cidr, name=target.name, action=ActionType.DELETE)
     change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Delete {}".format(change))
 
