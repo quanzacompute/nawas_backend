@@ -1,5 +1,6 @@
 parameterized
 Flask==3.0.2
+requests
 Flask-RESTful==0.3.10
 Flask-SQLAlchemy==3.0.2
 mysql-connector-python==8.0.28

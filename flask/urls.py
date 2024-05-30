@@ -1,6 +1,6 @@
 
 from app.models.tenant import TenantRoot, TenantById, TenantByName
-from app.models.asn import ASNRoot, ASNByASN
+from app.models.asn import ASNRoot, ASNByASN, SyncByASN
 from app.models.prefix import PrefixRoot, PrefixById
 from app.models.prefix_change import PrefixChangeById, PrefixChangeByASN, PrefixChangeByTenant
 
@@ -15,6 +15,7 @@ def loadUrls(api):
     #asn
     api.add_resource(ASNRoot, "/asn", "/asn/")
     api.add_resource(ASNByASN, "/asn/<int:asn>")
+    api.add_resource(SyncByASN, "/asn/<int:asn>/sync")
     
     #prefix
     api.add_resource(PrefixRoot, "/prefix", "/prefix/")
