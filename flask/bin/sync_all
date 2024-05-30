@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import requests, json
+import requests
 
 HOST = 'http://localhost:8000'
 HEADERS = {
@@ -8,9 +8,10 @@ HEADERS = {
 
 def main():
     r = requests.get("{}/asn".format(HOST), headers=HEADERS)
-    for asn in r:
+    for asn in r.json():
         print("SYNC: {}".format(asn))
         a = requests.get("{}/asn/{}/sync".format(HOST, asn['asn']), headers=HEADERS)
+    print("SYNC: COMPLETE")
 
 if __name__ == '__main__':
     main()
