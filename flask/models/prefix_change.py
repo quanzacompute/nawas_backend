@@ -30,19 +30,21 @@ class PrefixChange(db.Model):
     __tablename__ = 'prefix_change'
 
     ## columns
-    timestamp = db.Column( db.DateTime, nullable=False, server_default=db.func.now(), primary_key=True )
-    prefix_id = db.Column( db.Integer, db.ForeignKey('prefix.id'), nullable=False, primary_key=True)
-    prefix_name = db.Column (db.String(100), nullable=True)
-    action = db.Column( db.Enum(ActionType), primary_key=True )
-    old_cidr = db.Column(db.String(100), nullable=True)
-    new_cidr = db.Column(db.String(100), nullable=True)
+    count = db.Column( db.Integer, primary_key=True) 
+    timestamp = db.Column( db.DateTime, nullable=False, server_default=db.func.now())
+    asn = db.Column( db.Integer, nullable=True )
+    prefix_id = db.Column( db.Integer, nullable=True)
+    prefix_name = db.Column(db.String(100), nullable=True)
+    action = db.Column( db.Enum(ActionType))
+    cidr = db.Column(db.String(100), nullable=True)
 
     ## inserts a row into prefix_change table using the execute method of connection, to work around sessions in event listeners
     def insert_with_execute(self,conn):
         return conn.execute(PrefixChange.__table__.insert().values(
             prefix_id=self.prefix_id,
-            old_cidr=self.old_cidr,
-            new_cidr=self.new_cidr,
+            prefix_name=self.prefix_name,
+            asn=self.asn,
+            cidr=self.cidr,
             action=self.action
         ))
 
@@ -55,7 +57,7 @@ class PrefixChange(db.Model):
 @event.listens_for(Prefix, 'after_insert')
 def log_prefix_insert(mapper, connection, target):
     ## process insert
-    change = PrefixChange(prefix_id=target.id, new_cidr=target.cidr, name=target.name, action=ActionType.INSERT)
+    change = PrefixChange(prefix_id=target.id, asn=target.asn, cidr=target.cidr, prefix_name=target.name, action=ActionType.INSERT)
     change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Insert {}".format(change))
 
@@ -65,14 +67,14 @@ def log_prefix_update(mapper, connection, target):
     old_cidr = connection.scalars(
         db.select( Prefix.cidr ).filter_by(id=target.id)
     ).first()
-    change = PrefixChange(prefix_id=target.id, old_cidr=old_cidr, new_cidr=target.cidr, name=target.name, action=ActionType.UPDATE)
+    change = PrefixChange(prefix_id=target.id, asn=target.asn, cidr=target.cidr, prefix_name=target.name, action=ActionType.UPDATE)
     change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Update {}".format(change))
 
 @event.listens_for(Prefix, 'after_delete')
 def log_prefix_delete(mapper, connection, target):
     ## process delete
-    change = PrefixChange(prefix_id=target.id, old_cidr=target.cidr, name=target.name, action=ActionType.DELETE)
+    change = PrefixChange(prefix_id=target.id, asn=target.asn, cidr=target.cidr, prefix_name=target.name, action=ActionType.DELETE)
     change.insert_with_execute(connection)
     current_app.logger.debug("Processing Prefix Delete {}".format(change))
 
@@ -84,10 +86,11 @@ def log_prefix_delete(mapper, connection, target):
 ## API fields
 prefix_change_fields = {
     'timestamp': fields.DateTime(dt_format='iso8601'),
+    'asn': fields.Integer,
     'prefix_id': fields.Integer,
+    'prefix_name': fields.String,
     'action': fields.String,
-    'old_cidr': fields.String,
-    'new_cidr': fields.String
+    'cidr': fields.String
 }
 
 ## get prefix changes by prefix
@@ -119,11 +122,10 @@ class PrefixChangeByASN(Resource):
         prefix_ids = [ prefix[0] for prefix in db.session.query(Prefix).filter( Prefix.asn == asn ).with_entities(Prefix.id).all() ]
 
         query = db.session.query(PrefixChange)
+        query = query.filter(PrefixChange.asn == asn)
         if before: query = query.filter(PrefixChange.timestamp <= datetime.fromisoformat(before))
         if after: query = query.filter(PrefixChange.timestamp >= datetime.fromisoformat(after))
 
-        ## filter for prefix_ids associated with the provided asn
-        query = query.filter(PrefixChange.prefix_id.in_( prefix_ids ))
 
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes, 200
@@ -138,12 +140,11 @@ class PrefixChangeByTenant(Resource):
         
         # get asns associated with tenant_id, get prefix_ids associated with asns
         asns = [ asn[0] for asn in db.session.query(ASN).filter( ASN.tenant_id == id).with_entities(ASN.asn).all() ]
-        prefix_ids = [ prefix[0] for prefix in db.session.query(Prefix).filter( Prefix.asn.in_( asns )).with_entities(Prefix.id).all() ]
         
         query = db.session.query(PrefixChange)
         if before: query = query.filter(PrefixChange.timestamp <= datetime.fromisoformat(before))
         if after: query = query.filter(PrefixChange.timestamp >= datetime.fromisoformat(after))
-        query = query.filter(PrefixChange.prefix_id.in_( prefix_ids ))
+        query = query.filter(PrefixChange.asn.in_( asns ))
 
         changes = query.order_by(desc(PrefixChange.timestamp)).all()
         return changes

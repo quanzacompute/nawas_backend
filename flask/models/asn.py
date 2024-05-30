@@ -47,7 +47,8 @@ class ASN(db.Model):
             ## UPDATE
             if item['prefix'] == prefix.cidr:
                 found = True
-                prefix.name = item['name']
+                if prefix.name != item['name']: 
+                    prefix.name = item['name']
                 prefix.found = True
                 break
 
