@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+import requests, json
+
+HOST = 'http://localhost:8000'
+HEADERS = {
+    'Content-Type':'application/json'
+}
+
+def main():
+    r = requests.get("{}/asn".format(HOST), headers=HEADERS)
+    for asn in r:
+        print("SYNC: {}".format(asn))
+        a = requests.get("{}/asn/{}/sync".format(HOST, asn['asn']), headers=HEADERS)
+
+if __name__ == '__main__':
+    main()
