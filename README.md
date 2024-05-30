@@ -33,7 +33,6 @@ This will up both the database and the api, which should be in working order aft
 ### Model
 
 The API operates with 3 diffent objects:
-
   - Tenant
   - ASN
   - Prefix
@@ -47,7 +46,35 @@ These objects interact with each other as follows:
 ### Tenant
 Tenant represents the member which owns the different ASN and prefixes. This is a top level object used to aggregate all the different object belonging to it.
 
-It can be retrieved as a list, and individually by either name or id.
+It can be retrieved as a list, and individually by either name or id, using the following endpoints:
+
+- Root -> localhost:8000/tenant
+- ID -> localhost:8000/tenant/<int:id>
+- Name -> localhost:8000/tenant/<string:name>
+
+These endpoints can be approached with the following methods:
+
+#### GET
+Retrieves the current information in the database. This will return a data structure containing the tenant and all its children (asns, prefixes)
+
+#### POST / PUT
+Post: Creates a new instance of this object in the database. 
+Put: Updates an existing instance of the object.
+
+This method requires a payload as follows:
+
+```
+{
+  'id': 1,
+  'name': 'quanza'
+}
+```
+The id field does not have to be provided when using the POST method, this fields automatically auto increments when the object is created. 
+
+#### DELETE
+Deletes an instance of this object in the database.
+WARNING: this method will return a failure if the object still has children assigned to it in the database.
+
 
 ### ASN
 ### Prefix
