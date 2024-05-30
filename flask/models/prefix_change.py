@@ -32,7 +32,7 @@ class PrefixChange(db.Model):
     ## columns
     timestamp = db.Column( db.DateTime, nullable=False, server_default=db.func.now(), primary_key=True )
     prefix_id = db.Column( db.Integer, db.ForeignKey('prefix.id'), nullable=False, primary_key=True)
-    prefix_name = db.Column (db.String(100), nullable=True
+    prefix_name = db.Column (db.String(100), nullable=True)
     action = db.Column( db.Enum(ActionType), primary_key=True )
     old_cidr = db.Column(db.String(100), nullable=True)
     new_cidr = db.Column(db.String(100), nullable=True)
