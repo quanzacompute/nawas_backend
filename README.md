@@ -43,21 +43,21 @@ These objects interact with each other as follows:
 
 ![NBIP Stack - Data model(2)](https://github.com/quanzacompute/nawas_backend/assets/171254481/d06ed732-adca-43f7-82a3-6f472d9f5372)
 
-### Tenant
+### <u>Tenant</u>
 Tenant represents the member which owns the different ASN and prefixes. This is a top level object used to aggregate all the different object belonging to it.
 
 It can be interacted with as a list, and individually by either name or id, using the following endpoints:
 
 - Root -> localhost:8000/tenant
-- ID -> localhost:8000/tenant/<int:id>
-- Name -> localhost:8000/tenant/<string:name>
+- ID -> localhost:8000/tenant/\<int:id\>
+- Name -> localhost:8000/tenant/\<string:name\>
 
 These endpoints can be approached with the following methods:
 
-#### GET
+##### GET
 Retrieves the current information in the database. This will return a data structure containing the tenant and all its children (asns, prefixes)
 
-#### POST / PUT
+##### POST / PUT
 Post: Creates a new instance of this object in the database. 
 Put: Updates an existing instance of the object.
 
@@ -71,29 +71,29 @@ This method requires a payload as follows:
 ```
 The id field does not have to be provided when using the POST method, this fields automatically auto increments when the object is created. 
 
-#### DELETE
+##### DELETE
 Deletes an instance of this object in the database.
 WARNING: this method will return a failure if the object still has children assigned to it in the database.
 
 
-### ASN
+### <u>ASN</u>
 
 ASN is the object representing an Autonomous System Number, and is the object used to aggregate prefixes and sync them.
 
 It can be interacted with as a list, and individually by either name or id, using the following endpoints:
 
 - Root -> localhost:8000/asn
-- ID -> localhost:8000/asn/<int:id>
-- Sync -> localhost:8000/asn/<int:id>/sync
+- ID -> localhost:8000/asn/\<int:id\>
+- Sync -> localhost:8000/asn/\<int:id\>/sync
 
 The Sync endpoint triggers a sync action which will retrieve current information from the public database, which is bgpview in this case. This will compare prefixes assigned to the ASN with the situation in the database, and alter the database accordingly
 
 These endpoints can be approached with the following methods:
 
-#### GET
-Retrieves the current information in the database. This will return a data structure containing the tenant and all its children (asns, prefixes). A GET request on the Sync endpoint (as defined above), will trigger a sync action on the provided ASN. 
+##### GET
+Retrieves the current information in the database. This will return a data structure containing the asn and all its children (prefixes). A GET request on the Sync endpoint (as defined above), will trigger a sync action on the provided ASN. 
 
-#### POST / PUT
+##### POST / PUT
 Post: Creates a new instance of this object in the database. 
 Put: Updates an existing instance of the object.
 
@@ -108,12 +108,67 @@ This method requires a payload as follows:
 ```
 
 
-#### DELETE
+##### DELETE
 Deletes an instance of this object in the database.
 WARNING: this method will return a failure if the object still has children assigned to it in the database.
 
-### Prefix
+### <u>Prefix</u>
+Prefix is the object containing the ip prefix that is tracked, and is mainly provided from an upstream source through the sync action with the ASN model. Changes on this object are tracked using event handlers in the api, which trigger after an insert, update or delete is executed. It can be interacted with as a list, and individually by either name or id, using the following endpoints:
+
+- Root -> localhost:8000/prefix
+- ID -> localhost:8000/prefix/\<int:id\>
+
+The Sync endpoint triggers a sync action which will retrieve current information from the public database, which is bgpview in this case. This will compare prefixes assigned to the ASN with the situation in the database, and alter the database accordingly
+
+These endpoints can be approached with the following methods:
+
+##### GET
+Retrieves the current information in the database. This will return a data structure containing the prefix. 
+
+##### POST / PUT
+Post: Creates a new instance of this object in the database. 
+Put: Updates an existing instance of the object.
+
+This method requires a payload as follows:
+
+```
+{
+  'id': 1,
+  'asn': 201452,
+  'name': 'quanza-prefix'
+  'cidr': '8.8.8.8/24'
+}
+```
 
 
+##### DELETE
+Deletes an instance of this object in the database.
+
+WARNING: this method will cause any prefix changes recorded on this id to have their prefix_id set to null. These messages will still be accessible through either the asn or the tenant (see instructions below).
 
 ### PrefixChange
+
+PrefixChange is the object that is used to record changes to the prefix object. It can be triggered on one of the following actions:
+
+- INSERT
+- UPDATE
+- DELETE
+
+After such an action is committed to the database, a message is inserted to record the timestamp and details of the change.
+
+Changes can be accessed with a GET request to the following endpoints, each aggregated on different parent objects:
+
+- Tenant   -> localhost:8000/tenant/change/\<int:id\>
+- ASN      -> localhost:8000/asn/change/\<asn:id\>
+- Prefix   -> localhost:8000/prefix/change/\<int:id\>
+
+The following arguments can also be provided (Using ISO8601 formatting), to filter messages based on time:
+
+- before
+- after
+
+for example:
+```
+curl -x GET localhost:8000/tenant/change/1?after=2020-01-01T20:00:00Z&before=2022-01-01T00:00:00Z
+```
+
