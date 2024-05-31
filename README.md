@@ -5,6 +5,11 @@ The main stack is made of a mysql database in combination with a Flask applicati
 
 ## Deployment
 
+### Docker
+This project requires a docker installation based of this instruction:
+- Docker Engine: https://docs.docker.com/engine/install/
+- Docker compose plugin: https://docs.docker.com/compose/install/
+
 ### Secrets
 To deploy the stack, please make sure to create a directory in the root of this project, called secrets. 
 
