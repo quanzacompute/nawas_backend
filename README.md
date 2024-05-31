@@ -93,6 +93,11 @@ It can be interacted with as a list, and individually by either name or id, usin
 
 The Sync endpoint triggers a sync action which will retrieve current information from the public database, which is bgpview in this case. This will compare prefixes assigned to the ASN with the situation in the database, and alter the database accordingly
 
+A sync all command has been added to the flask/bin/sync_all location, and can be called or scheduled using the following command (in case of scheduling you might need the -T flag because of tty things):
+```
+docker compose exec api bin/sync_all
+```
+
 These endpoints can be approached with the following methods:
 
 ##### GET
